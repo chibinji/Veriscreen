@@ -2,17 +2,22 @@ package com.veriscreen.backend.service;
 
 import com.veriscreen.backend.entity.Student;
 import com.veriscreen.backend.repository.StudentRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class DataLoader implements CommandLineRunner {
-    @Autowired
-    private StudentRepository studentRepository;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+
+    private final StudentRepository studentRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    public DataLoader(StudentRepository studentRepository, PasswordEncoder passwordEncoder) {
+        this.studentRepository = studentRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Override
     public void run(String... args) {
@@ -25,6 +30,7 @@ public class DataLoader implements CommandLineRunner {
             student.setEnrollmentYear(2021);
             student.setPassword(passwordEncoder.encode("password123"));
             studentRepository.save(student);
+            log.info("Seeded mock student id={}", student.getId());
         }
     }
 }

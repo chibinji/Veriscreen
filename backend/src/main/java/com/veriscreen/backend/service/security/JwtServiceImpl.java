@@ -1,33 +1,44 @@
-package com.veriscreen.backend.util;
+package com.veriscreen.backend.service.security;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.util.Date;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
-public class JwtUtil {
-    @Value("${jwt.secret}")
-    private String secret;
+/**
+ * Single responsibility: JWT creation and validation only (no database access).
+ */
+@Service
+public class JwtServiceImpl implements JwtService {
 
-    @Value("${jwt.expiration}")
-    private Long expiration;
+    private final String secret;
+    private final long expirationMs;
 
+    public JwtServiceImpl(
+            @Value("${jwt.secret}") String secret,
+            @Value("${jwt.expiration}") long expirationMs) {
+        this.secret = secret;
+        this.expirationMs = expirationMs;
+    }
+
+    @Override
     public String generateToken(String studentId) {
         return Jwts.builder()
                 .setSubject(studentId)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
                 .signWith(SignatureAlgorithm.HS256, secret)
                 .compact();
     }
 
+    @Override
     public String extractStudentId(String token) {
         return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody().getSubject();
     }
 
-    public Boolean validateToken(String token) {
+    @Override
+    public boolean validateToken(String token) {
         try {
             Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
             return true;
