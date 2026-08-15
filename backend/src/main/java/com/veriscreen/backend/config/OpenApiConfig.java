@@ -15,7 +15,7 @@ public class OpenApiConfig {
         return new OpenAPI()
                 .info(new Info()
                         .title("VeriScreen API")
-                        .description("University student screening REST API (Sprint 1)")
+                        .description("University student screening REST API (Sprint 2)")
                         .version("v1"))
                 .components(new Components()
                         .addSecuritySchemes("bearerAuth", new SecurityScheme()

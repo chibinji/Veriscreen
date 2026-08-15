@@ -25,10 +25,13 @@ public class ApiInfoController {
                         "legacyPath", ApiPaths.LEGACY_AUTH + "/login",
                         "body", Map.of("id", "studentId", "password", "string"),
                         "note", "Returns accessToken — use POST, not GET"),
-                Map.of("method", "GET", "path", ApiPaths.STUDENTS + "/me/profile",
-                        "auth", "Bearer JWT"),
-                Map.of("method", "GET", "path", ApiPaths.STUDENTS + "/me/documents",
-                        "auth", "Bearer JWT")
+                Map.of("method", "GET", "path", ApiPaths.STUDENTS + "/me/profile", "auth", "Bearer JWT"),
+                Map.of("method", "GET", "path", ApiPaths.STUDENTS + "/me/documents", "auth", "Bearer JWT"),
+                Map.of("method", "GET", "path", ApiPaths.STUDENTS + "/me/registrations", "auth", "Bearer JWT"),
+                Map.of("method", "GET", "path", ApiPaths.STUDENTS + "/me/fees", "auth", "Bearer JWT"),
+                Map.of("method", "GET", "path", ApiPaths.STUDENTS + "/me/examinations", "auth", "Bearer JWT"),
+                Map.of("method", "GET", "path", ApiPaths.STUDENTS + "/me/academic-results", "auth", "Bearer JWT"),
+                Map.of("method", "GET", "path", ApiPaths.STUDENTS + "/me/helsb", "auth", "Bearer JWT")
         ));
         return info;
     }

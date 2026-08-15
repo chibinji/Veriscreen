@@ -4,7 +4,7 @@ import com.veriscreen.backend.dto.DocumentDto;
 import java.time.LocalDate;
 
 /**
- * Base for Sprint 1 placeholder generators; PDF implementations can extend this later.
+ * Shared builder helpers for document generators.
  */
 public abstract class AbstractPlaceholderDocumentGenerator implements DocumentGenerator {
 
@@ -14,10 +14,14 @@ public abstract class AbstractPlaceholderDocumentGenerator implements DocumentGe
         this.displayType = displayType;
     }
 
-    @Override
-    public DocumentDto generate(String studentId) {
+    protected String displayType() {
+        return displayType;
+    }
+
+    protected DocumentDto buildDocument(String summary) {
         return DocumentDto.builder()
                 .type(displayType)
+                .summary(summary)
                 .generatedDate(LocalDate.now().toString())
                 .build();
     }

@@ -12,5 +12,6 @@ import lombok.NoArgsConstructor;
 public class DocumentDto {
     private String type;
     private String url;
+    private String summary;
     private String generatedDate;
 }
