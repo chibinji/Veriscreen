@@ -1,38 +1,36 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
-import Layout from './components/Layout';
-import ProtectedRoute from './components/ProtectedRoute';
-import { AuthProvider } from './context/AuthContext';
-import AcademicResultsPage from './pages/AcademicResultsPage';
-import DashboardPage from './pages/DashboardPage';
-import DocumentsPage from './pages/DocumentsPage';
-import ExaminationsPage from './pages/ExaminationsPage';
-import FeesPage from './pages/FeesPage';
-import HelsbPage from './pages/HelsbPage';
-import LoginPage from './pages/LoginPage';
-import ProfilePage from './pages/ProfilePage';
-import RegistrationsPage from './pages/RegistrationsPage';
+import React, { useEffect } from 'react';
+import { BrowserRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import AppRouter from './routes/AppRouter';
+import { useAuthStore } from './store/authStore';
+import ErrorBoundary from './components/common/ErrorBoundary';
 
-export default function App() {
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
+const App: React.FC = () => {
+  const { initializeFromStorage } = useAuthStore();
+
+  useEffect(() => {
+    initializeFromStorage();
+  }, [initializeFromStorage]);
+
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route element={<ProtectedRoute />}>
-            <Route element={<Layout />}>
-              <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/documents" element={<DocumentsPage />} />
-              <Route path="/registrations" element={<RegistrationsPage />} />
-              <Route path="/fees" element={<FeesPage />} />
-              <Route path="/examinations" element={<ExaminationsPage />} />
-              <Route path="/academic-results" element={<AcademicResultsPage />} />
-              <Route path="/helsb" element={<HelsbPage />} />
-            </Route>
-          </Route>
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <ErrorBoundary>
+        <BrowserRouter>
+          <AppRouter />
+        </BrowserRouter>
+      </ErrorBoundary>
+    </QueryClientProvider>
   );
-}
+};
+
+export default App;

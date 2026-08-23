@@ -82,10 +82,10 @@ public class DataLoader implements CommandLineRunner {
         examinationRepository.save(examination(student, "2024/2025", true, "CLEARED"));
         examinationRepository.save(examination(student, "2023/2024", true, "COMPLETED"));
 
-        academicResultRepository.save(result(student, "CSC3101", "A", 3));
-        academicResultRepository.save(result(student, "CSC3102", "B+", 3));
-        academicResultRepository.save(result(student, "MAT2101", "A-", 4));
-        academicResultRepository.save(result(student, "ENG1201", "B", 2));
+        academicResultRepository.save(result(student, "CSC4101", "A", 3));
+        academicResultRepository.save(result(student, "CSC4102", "B+", 3));
+        academicResultRepository.save(result(student, "CSC4901", "A", 4));
+        academicResultRepository.save(result(student, "CSC4201", "B", 2));
 
         helsbApplicationRepository.save(helsb(
                 student, "APPROVED", "DISBURSED", "CLEARED", "2024/2025 loan contract active"));

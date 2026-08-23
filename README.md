@@ -17,6 +17,7 @@ Student web app + Spring Boot backend for verified academic document access and 
 |--------|-------------|
 | `backend/` | Spring Boot REST API (JWT, PostgreSQL, OpenAPI) |
 | `frontend/` | React + TypeScript student web portal |
+| `mobile/` | Expo (React Native) student mobile app |
 | `docs/` | Architecture guides and project documents |
 
 ## Quick start
@@ -56,7 +57,20 @@ Swagger: `http://localhost:8080/swagger-ui.html`
 
 In dev, the frontend **proxies** `/api` requests to the backend, so you don't need to worry about different ports in the browser.
 
-**Both must be running at the same time** — start the backend first, then the frontend.
+**Both web and backend must be running at the same time** — start the backend first, then the frontend.
+
+### 3. Mobile app
+
+1. Keep the backend running.
+2. Install and start Expo:
+   ```bash
+   cd mobile
+   npm install
+   npx expo start
+   ```
+3. Scan the QR code with Expo Go, or press `a` for an Android emulator.
+
+A phone cannot use `localhost`. The app uses your PC's LAN IP on port 8080 by default. Details: [mobile/README.md](mobile/README.md).
 
 ## Mock student accounts
 
