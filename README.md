@@ -70,7 +70,7 @@ In dev, the frontend **proxies** `/api` requests to the backend, so you don't ne
    ```
 3. Scan the QR code with Expo Go, or press `a` for an Android emulator.
 
-A phone cannot use `localhost`. The app uses your PC's LAN IP on port 8080 by default. Details: [mobile/README.md](mobile/README.md).
+A phone cannot use `localhost`. The app uses your PC's LAN IP on port **8081** by default. Details: [mobile/README.md](mobile/README.md).
 
 ## Mock student accounts
 

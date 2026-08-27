@@ -5,7 +5,7 @@ import type {
 } from '../types';
 
 export const helsbService = {
-  submitApplication: (documentIds: number[]) => helsbApi.submitApplication(documentIds),
+  submitApplication: (documentIds: Array<number | string> = []) => helsbApi.submitApplication(documentIds),
   getMyApplication: () => helsbApi.getMyApplication(),
   confirmApplication: (applicationId: number) => helsbApi.confirmApplication(applicationId),
   submitBankDetails: (data: Omit<BankDetails, 'id'>) => helsbApi.submitBankDetails(data),

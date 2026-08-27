@@ -6,3 +6,5 @@ frontend/dist/
 mobile/node_modules/
 mobile/.expo/
 mobile/dist/
+generated-documents/
+backend/generated-documents/

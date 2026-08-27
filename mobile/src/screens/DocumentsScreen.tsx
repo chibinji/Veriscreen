@@ -6,7 +6,7 @@ import { studentApi } from '../api/studentApi';
 import { EmptyState, ErrorBanner, LoadingBlock } from '../components/Feedback';
 import { StatusBadge } from '../components/StatusBadge';
 import type { DocumentRecord } from '../types';
-import { colors, spacing } from '../theme';
+import { colors, radii, spacing } from '../theme';
 
 export default function DocumentsScreen() {
   const { token } = useAuth();
@@ -54,8 +54,8 @@ export default function DocumentsScreen() {
             <Text style={styles.summary}>{doc.summary}</Text>
             <View style={styles.row}>
               <StatusBadge status="GENERATED" label="Verified" />
-              <Pressable onPress={() => setPreview(doc)}>
-                <Text style={styles.link}>Preview</Text>
+              <Pressable style={styles.preview} onPress={() => setPreview(doc)}>
+                <Text style={styles.previewText}>Preview</Text>
               </Pressable>
             </View>
           </View>
@@ -93,7 +93,13 @@ const styles = StyleSheet.create({
   meta: { color: colors.muted, marginTop: 4, fontSize: 12 },
   summary: { color: colors.ink, marginTop: 10, lineHeight: 20 },
   row: { marginTop: 12, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  link: { color: colors.lapis, fontWeight: '700' },
+  preview: {
+    backgroundColor: colors.indigo,
+    borderRadius: radii.control,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+  },
+  previewText: { color: colors.white, fontWeight: '700', fontSize: 13 },
   overlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.45)',
@@ -105,8 +111,8 @@ const styles = StyleSheet.create({
   close: {
     marginTop: spacing.md,
     backgroundColor: colors.indigo,
-    borderRadius: 12,
-    paddingVertical: 12,
+    borderRadius: radii.control,
+    paddingVertical: 14,
     alignItems: 'center',
   },
   closeText: { color: colors.white, fontWeight: '700' },

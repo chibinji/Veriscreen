@@ -2,10 +2,28 @@ import type { Document, DocumentType } from '../types';
 import { downloadBlob } from '../utils';
 import { fail, getSessionUser, requireSession } from './mockClient';
 import { API_ENDPOINTS } from '../constants';
-import apiClient from '../services/apiClient';
+import apiClient, { toApiException } from '../services/apiClient';
 import { toDocument, type BackendDocument } from './mappers';
+import { ApiException } from './mockClient';
 
 const documentSummaries = new Map<number, { summary: string; url?: string; typeLabel: string }>();
+
+const GENERATE_PATH: Record<string, string> = {
+  CONFIRMATION_SLIP: 'confirmation',
+  RESULTS: 'results',
+  TRANSCRIPT: 'results',
+  EXAMINATION_SLIP: 'examination',
+  EXAM_SLIP: 'examination',
+  PAYMENT_HISTORY: 'payment-history',
+  FEE_STATEMENT: 'payment-history',
+};
+
+export interface GeneratedOfficialDocument {
+  documentId: string;
+  documentType: string;
+  status: string;
+  generatedAt: string;
+}
 
 function studentNameFromSession(): { studentNumber: string; studentName: string } {
   const session = getSessionUser();
@@ -40,6 +58,25 @@ function previewHtml(doc: Document, summary: string): string {
 </html>`;
 }
 
+async function readBlobError(error: unknown): Promise<never> {
+  const axiosError = error as {
+    response?: { status?: number; data?: Blob | { message?: string } };
+    message?: string;
+  };
+  const data = axiosError.response?.data;
+  if (data instanceof Blob) {
+    const text = await data.text();
+    try {
+      const json = JSON.parse(text) as { message?: string };
+      throw new ApiException(axiosError.response?.status ?? 0, json.message || 'Document request failed.');
+    } catch (parseError) {
+      if (parseError instanceof ApiException) throw parseError;
+      throw new ApiException(axiosError.response?.status ?? 0, text || 'Document request failed.');
+    }
+  }
+  throw toApiException(error);
+}
+
 export const documentsApi = {
   async getDocuments(): Promise<Document[]> {
     requireSession();
@@ -64,8 +101,44 @@ export const documentsApi = {
     return doc;
   },
 
-  async generateDocument(_type: DocumentType): Promise<Document> {
-    fail(404, 'Generating documents is not available. The server lists verified documents and does not provide a generate endpoint.');
+  async generateDocument(type: DocumentType): Promise<GeneratedOfficialDocument> {
+    requireSession();
+    const pathType = GENERATE_PATH[type];
+    if (!pathType) {
+      fail(400, 'This document type cannot be generated.');
+    }
+    const { data } = await apiClient.post<GeneratedOfficialDocument>(API_ENDPOINTS.GENERATE_DOCUMENT(pathType));
+    return data;
+  },
+
+  async downloadOfficialDocument(documentId: string, filename?: string): Promise<void> {
+    requireSession();
+    try {
+      const { data } = await apiClient.get<Blob>(API_ENDPOINTS.DOWNLOAD_DOCUMENT(documentId), {
+        responseType: 'blob',
+      });
+      downloadBlob(data, filename || `${documentId}.pdf`);
+    } catch (error) {
+      await readBlobError(error);
+    }
+  },
+
+  async generateAndDownload(type: DocumentType): Promise<GeneratedOfficialDocument> {
+    const generated = await this.generateDocument(type);
+    await this.downloadOfficialDocument(generated.documentId, `${generated.documentId}.pdf`);
+    return generated;
+  },
+
+  async fetchOfficialPdf(documentId: string): Promise<Blob> {
+    requireSession();
+    try {
+      const { data } = await apiClient.get<Blob>(API_ENDPOINTS.DOWNLOAD_DOCUMENT(documentId), {
+        responseType: 'blob',
+      });
+      return data;
+    } catch (error) {
+      await readBlobError(error);
+    }
   },
 
   async downloadDocument(id: number, filename: string): Promise<void> {

@@ -31,7 +31,7 @@ const PrivateLayout: React.FC<Props> = ({ navItems }) => {
 
   if (!user) {
     return (
-      <div className="d-flex align-items-center justify-content-center min-vh-100 bg-light">
+      <div className="d-flex align-items-center justify-content-center min-vh-100 vs-canvas">
         <div className="spinner-border text-primary" role="status">
           <span className="visually-hidden">Loading…</span>
         </div>
@@ -40,7 +40,7 @@ const PrivateLayout: React.FC<Props> = ({ navItems }) => {
   }
 
   return (
-    <div className="d-flex">
+    <div className="d-flex vs-canvas">
       <Sidebar
         open={sidebarOpen}
         onClose={() => setSidebarOpen(false)}

@@ -7,7 +7,7 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import StatusBadge from '../../components/common/StatusBadge';
 import AlertMessage from '../../components/common/AlertMessage';
 import EmptyState from '../../components/common/EmptyState';
-import { formatDateTime, getDocumentLabel, getErrorMessage } from '../../utils';
+import { formatDateTime, getDocumentLabel, getErrorMessage, getHelsbStatusLabel, isHelsbWaitingApproval } from '../../utils';
 
 const StudentApplications: React.FC = () => {
   const [selectedDocs, setSelectedDocs] = useState<number[]>([]);
@@ -34,7 +34,7 @@ const StudentApplications: React.FC = () => {
       const creds = app.helsbCredentials
         ? ` HELSB portal username: ${app.helsbCredentials.username} (password: ${app.helsbCredentials.temporaryPassword}).`
         : '';
-      setSuccess(`Application submitted to HELSB successfully.${creds}`);
+      setSuccess(`Documents submitted to HELSB. Status: ${getHelsbStatusLabel(app.status)}.${creds}`);
       setSelectedDocs([]);
       setConsent(false);
     },
@@ -73,7 +73,7 @@ const StudentApplications: React.FC = () => {
             <div className="row g-3">
               {[
                 { label: 'Application Number', value: application.applicationNumber },
-                { label: 'Status', value: <StatusBadge status={application.status} /> },
+                { label: 'Status', value: <StatusBadge status={application.status} label={getHelsbStatusLabel(application.status)} /> },
                 { label: 'Submitted', value: formatDateTime(application.submittedAt) },
                 { label: 'Reviewed', value: formatDateTime(application.reviewedAt) },
               ].map((item) => (
@@ -85,6 +85,18 @@ const StudentApplications: React.FC = () => {
                 </div>
               ))}
             </div>
+            {isHelsbWaitingApproval(application.status) && (
+              <div className="mt-3 alert alert-warning mb-0">
+                <i className="bi bi-hourglass-split me-2" />
+                Documents have been submitted and are waiting for HELSB verification and approval.
+              </div>
+            )}
+            {application.status === 'APPROVED' && (
+              <div className="mt-3 alert alert-success mb-0">
+                <i className="bi bi-check-circle me-2" />
+                Documents have been verified and this application is approved.
+              </div>
+            )}
             {application.notes && (
               <div className="mt-3 alert alert-info mb-0">
                 <i className="bi bi-info-circle me-2" />
@@ -96,7 +108,7 @@ const StudentApplications: React.FC = () => {
       ) : null}
 
       {/* Submit new application */}
-      {!application && (
+      {!isHelsbWaitingApproval(application?.status) && (
         <div className="card border-0 shadow-sm">
           <div className="card-header bg-white border-bottom fw-semibold py-3">
             <i className="bi bi-send me-2 text-primary" />Submit New Application

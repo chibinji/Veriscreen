@@ -117,8 +117,11 @@ export interface UserSettings {
 // ─── Document Types ──────────────────────────────────────────────────────────
 export type DocumentType =
   | 'TRANSCRIPT'
+  | 'RESULTS'
   | 'EXAM_SLIP'
+  | 'EXAMINATION_SLIP'
   | 'FEE_STATEMENT'
+  | 'PAYMENT_HISTORY'
   | 'CONFIRMATION_SLIP'
   | 'CONTRACT';
 
@@ -140,13 +143,15 @@ export interface Document {
 export type VerificationStatus = 'VALID' | 'INVALID' | 'EXPIRED';
 
 export interface VerificationResult {
+  valid?: boolean;
   status: VerificationStatus;
-  documentType: DocumentType;
-  studentNumber: string;
-  studentName: string;
-  generatedAt: string;
-  verifiedAt: string;
-  issuedBy: string;
+  documentId?: string;
+  documentType?: DocumentType | string;
+  studentNumber?: string;
+  studentName?: string;
+  generatedAt?: string;
+  verifiedAt?: string;
+  issuedBy?: string;
 }
 
 // ─── Application / HELSB Types ───────────────────────────────────────────────

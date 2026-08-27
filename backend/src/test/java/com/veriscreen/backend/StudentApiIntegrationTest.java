@@ -97,6 +97,81 @@ class StudentApiIntegrationTest {
                 .andExpect(jsonPath("$[1].summary").isNotEmpty());
     }
 
+    @Test
+    void generateDownloadAndVerifyOfficialDocument() throws Exception {
+        String token = loginAndGetToken();
+
+        MvcResult generateResult = mockMvc.perform(post("/api/v1/students/me/documents/generate/confirmation")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.documentId").isNotEmpty())
+                .andExpect(jsonPath("$.documentType").value("CONFIRMATION_SLIP"))
+                .andExpect(jsonPath("$.status").value("VALID"))
+                .andReturn();
+
+        String documentId = objectMapper.readTree(generateResult.getResponse().getContentAsString())
+                .get("documentId")
+                .asText();
+
+        mockMvc.perform(get("/api/v1/students/me/documents/" + documentId + "/download")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(result -> {
+                    byte[] body = result.getResponse().getContentAsByteArray();
+                    if (body.length < 5 || body[0] != '%' || body[1] != 'P' || body[2] != 'D' || body[3] != 'F') {
+                        throw new AssertionError("Expected a PDF response");
+                    }
+                });
+
+        mockMvc.perform(get("/api/verify/" + documentId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.valid").value(true))
+                .andExpect(jsonPath("$.documentId").value(documentId))
+                .andExpect(jsonPath("$.documentType").value("CONFIRMATION_SLIP"))
+                .andExpect(jsonPath("$.status").value("VALID"))
+                .andExpect(jsonPath("$.studentName").doesNotExist())
+                .andExpect(jsonPath("$.studentNumber").doesNotExist());
+
+        mockMvc.perform(get("/api/verify/VS-2026-RES-999999"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.valid").value(false))
+                .andExpect(jsonPath("$.status").value("INVALID"));
+
+        for (String type : new String[] {"results", "examination", "payment-history"}) {
+            mockMvc.perform(post("/api/v1/students/me/documents/generate/" + type)
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.documentId").isNotEmpty())
+                    .andExpect(jsonPath("$.status").value("VALID"));
+        }
+    }
+
+    @Test
+    void cannotDownloadAnotherStudentsOfficialDocument() throws Exception {
+        String token = loginAndGetToken();
+
+        MvcResult generateResult = mockMvc.perform(post("/api/v1/students/me/documents/generate/results")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andReturn();
+        String documentId = objectMapper.readTree(generateResult.getResponse().getContentAsString())
+                .get("documentId")
+                .asText();
+
+        MvcResult otherLogin = mockMvc.perform(post("/api/v1/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"id\":\"2022030346\",\"password\":\"" + PASSWORD + "\"}"))
+                .andExpect(status().isOk())
+                .andReturn();
+        String otherToken = objectMapper.readTree(otherLogin.getResponse().getContentAsString())
+                .get("accessToken")
+                .asText();
+
+        mockMvc.perform(get("/api/v1/students/me/documents/" + documentId + "/download")
+                        .header("Authorization", "Bearer " + otherToken))
+                .andExpect(status().isForbidden());
+    }
+
     private String loginAndGetToken() throws Exception {
         MvcResult loginResult = mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)

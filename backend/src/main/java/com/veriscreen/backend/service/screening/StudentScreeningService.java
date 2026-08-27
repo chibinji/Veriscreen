@@ -30,4 +30,6 @@ public interface StudentScreeningService {
 
     List<HelsbApplicationDto> listHelsbApplicationsForStudent(
             String authenticatedStudentId, String requestedStudentId);
+
+    HelsbApplicationDto submitHelsbApplication(String authenticatedStudentId, List<String> documentIds);
 }

@@ -2,18 +2,24 @@ package com.veriscreen.backend.controller;
 
 import com.veriscreen.backend.constants.ApiPaths;
 import com.veriscreen.backend.dto.DocumentDto;
+import com.veriscreen.backend.dto.GeneratedDocumentResponse;
 import com.veriscreen.backend.dto.StudentProfileDto;
+import com.veriscreen.backend.entity.OfficialDocumentType;
 import com.veriscreen.backend.service.document.DocumentService;
 import com.veriscreen.backend.service.student.StudentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -59,5 +65,29 @@ public class StudentController {
             @PathVariable String studentId) {
         return ResponseEntity.ok(
                 documentService.listDocumentsForStudent(principal.getUsername(), studentId));
+    }
+
+    @PostMapping("/me/documents/generate/{type}")
+    @Operation(summary = "Generate an official PDF for the authenticated student")
+    public ResponseEntity<GeneratedDocumentResponse> generateDocument(
+            @AuthenticationPrincipal UserDetails principal,
+            @PathVariable String type) {
+        return ResponseEntity.ok(
+                documentService.generateOfficialDocument(
+                        principal.getUsername(), OfficialDocumentType.fromPath(type)));
+    }
+
+    @GetMapping("/me/documents/{documentId}/download")
+    @Operation(summary = "Download an official PDF issued to the authenticated student")
+    public ResponseEntity<byte[]> downloadDocument(
+            @AuthenticationPrincipal UserDetails principal,
+            @PathVariable String documentId) {
+        byte[] pdf = documentService.downloadOfficialDocument(principal.getUsername(), documentId);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDisposition(ContentDisposition.attachment().filename(documentId + ".pdf").build());
+        headers.setContentLength(pdf.length);
+        headers.add("X-Document-Id", documentId);
+        return ResponseEntity.ok().headers(headers).body(pdf);
     }
 }

@@ -1,144 +1,170 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import React, { useEffect, useState } from 'react';
 import { documentService } from '../../services/documentService';
 import type { DocumentType } from '../../types';
 import PageHeader from '../../components/common/PageHeader';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
-import StatusBadge from '../../components/common/StatusBadge';
-import EmptyState from '../../components/common/EmptyState';
 import AlertMessage from '../../components/common/AlertMessage';
-import { formatDateTime, getDocumentLabel } from '../../utils';
+import { downloadBlob, getDocumentLabel, getErrorMessage } from '../../utils';
 import { DOCUMENT_ICONS } from '../../constants';
+
+interface DocumentOption {
+  type: DocumentType;
+  pathLabel: string;
+  description: string;
+}
+
+interface PreviewState {
+  type: DocumentType;
+  documentId: string;
+  url: string;
+  blob: Blob;
+}
+
+const DOCUMENT_OPTIONS: DocumentOption[] = [
+  {
+    type: 'CONFIRMATION_SLIP',
+    pathLabel: 'Confirmation Slip',
+    description: 'Official confirmation from your registration records.',
+  },
+  {
+    type: 'RESULTS',
+    pathLabel: 'Results',
+    description: 'Academic results recorded for your student account.',
+  },
+  {
+    type: 'EXAMINATION_SLIP',
+    pathLabel: 'Examination Slip',
+    description: 'Examination eligibility and status from your record.',
+  },
+  {
+    type: 'PAYMENT_HISTORY',
+    pathLabel: 'Payment History',
+    description: 'Fee payments and outstanding balances on file.',
+  },
+];
 
 const DocumentsPage: React.FC = () => {
   const [error, setError] = useState('');
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [success, setSuccess] = useState('');
+  const [loadingType, setLoadingType] = useState<DocumentType | null>(null);
+  const [selectedType, setSelectedType] = useState<DocumentType | null>(null);
+  const [preview, setPreview] = useState<PreviewState | null>(null);
 
-  const { data: documents, isLoading, isError } = useQuery({
-    queryKey: ['my-documents'],
-    queryFn: documentService.getMyDocuments,
-  });
+  useEffect(() => {
+    return () => {
+      if (preview?.url) URL.revokeObjectURL(preview.url);
+    };
+  }, [preview?.url]);
 
-  const handleDownload = (id: number, type: DocumentType) => {
-    documentService.downloadDocument(id, `${type}_${id}.pdf`);
-  };
-
-  const handlePreview = async (id: number) => {
+  const loadPreview = async (type: DocumentType) => {
+    setError('');
+    setSuccess('');
+    setSelectedType(type);
+    setLoadingType(type);
     try {
-      const url = await documentService.previewDocument(id);
-      setPreviewUrl(url);
-    } catch {
-      setError('Unable to preview document.');
+      const generated = await documentService.generateDocument(type);
+      const blob = await documentService.fetchOfficialPdf(generated.documentId);
+      const url = URL.createObjectURL(blob);
+      setPreview((current) => {
+        if (current?.url) URL.revokeObjectURL(current.url);
+        return { type, documentId: generated.documentId, url, blob };
+      });
+    } catch (err) {
+      setPreview(null);
+      setError(getErrorMessage(err) || `Unable to preview ${getDocumentLabel(type)}.`);
+    } finally {
+      setLoadingType(null);
     }
   };
+
+  const handleDownload = () => {
+    if (!preview) return;
+    downloadBlob(preview.blob, `${preview.documentId}.pdf`);
+    setSuccess(`${getDocumentLabel(preview.type)} downloaded. Document ID: ${preview.documentId}`);
+  };
+
+  const selectedOption = DOCUMENT_OPTIONS.find((option) => option.type === selectedType);
 
   return (
     <div>
       <PageHeader
         title="My Documents"
-        subtitle="Preview and download your verified academic documents."
+        subtitle="Preview an official document, then download it. Each document receives a unique VeriScreen ID and verification QR code."
         breadcrumbs={[{ label: 'Dashboard', path: '/student/dashboard' }, { label: 'Documents' }]}
       />
 
       {error && <AlertMessage type="danger" message={error} onDismiss={() => setError('')} />}
-      {isError && !error && <AlertMessage type="danger" message="Unable to load documents." />}
+      {success && <AlertMessage type="success" message={success} onDismiss={() => setSuccess('')} />}
+
+      <div className="row g-3 mb-4">
+        {DOCUMENT_OPTIONS.map((option) => {
+          const loading = loadingType === option.type;
+          const selected = selectedType === option.type;
+          return (
+            <div className="col-md-6" key={option.type}>
+              <button
+                type="button"
+                className={`card shadow-sm h-100 w-100 text-start ${selected ? 'border-primary' : 'border-0'}`}
+                disabled={loadingType !== null}
+                onClick={() => loadPreview(option.type)}
+              >
+                <div className="card-body d-flex align-items-start gap-3">
+                  <div className="rounded-3 p-3 bg-primary-subtle">
+                    <i className={`bi ${DOCUMENT_ICONS[option.type]} fs-4 text-primary`} />
+                  </div>
+                  <div>
+                    <h6 className="fw-semibold text-navy mb-1">{option.pathLabel}</h6>
+                    <p className="text-muted small mb-0">{option.description}</p>
+                    {loading && (
+                      <p className="small text-primary mb-0 mt-2">
+                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />
+                        Loading preview…
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </button>
+            </div>
+          );
+        })}
+      </div>
 
       <div className="card border-0 shadow-sm">
-        <div className="card-header bg-white border-bottom fw-semibold py-3 text-navy">
-          <i className="bi bi-file-earmark-check me-2 text-gold" />Verified Documents
+        <div className="card-header bg-white border-bottom fw-semibold py-3 text-navy d-flex justify-content-between align-items-center">
+          <span>
+            <i className="bi bi-eye me-2 text-gold" />
+            Document preview
+            {selectedOption ? ` — ${selectedOption.pathLabel}` : ''}
+          </span>
+          {preview && <code className="small bg-light px-2 py-1 rounded">{preview.documentId}</code>}
         </div>
         <div className="card-body p-0">
-          {isLoading ? (
-            <LoadingSpinner text="Loading documents…" />
-          ) : !documents || documents.length === 0 ? (
-            <EmptyState
-              icon="bi-file-earmark-check"
-              title="No verified documents"
-              description="Verified academic documents will appear here once they are available."
+          {loadingType ? (
+            <div className="text-center py-5 text-muted">
+              <span className="spinner-border text-primary mb-3" role="status" aria-hidden="true" />
+              <p className="small mb-0">Preparing official document preview…</p>
+            </div>
+          ) : preview ? (
+            <iframe
+              src={preview.url}
+              title={`${getDocumentLabel(preview.type)} preview`}
+              style={{ width: '100%', height: '70vh', border: 'none' }}
             />
           ) : (
-            <div className="table-responsive">
-              <table className="table table-hover align-middle mb-0">
-                <thead className="table-light">
-                  <tr>
-                    <th>Document Type</th>
-                    <th>Verification Code</th>
-                    <th>Verified</th>
-                    <th>Expires</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {documents.map((doc) => (
-                    <tr key={doc.id}>
-                      <td>
-                        <div className="d-flex align-items-center gap-2">
-                          <i className={`bi ${DOCUMENT_ICONS[doc.type]} text-indigo`} />
-                          <span className="fw-medium small text-navy">{getDocumentLabel(doc.type)}</span>
-                        </div>
-                      </td>
-                      <td>
-                        <code className="small bg-light px-2 py-1 rounded">{doc.verificationCode}</code>
-                      </td>
-                      <td><span className="small text-muted">{formatDateTime(doc.generatedAt)}</span></td>
-                      <td><span className="small text-muted">{formatDateTime(doc.expiresAt)}</span></td>
-                      <td>
-                        <StatusBadge
-                          status={doc.status}
-                          label={doc.status === 'GENERATED' ? 'Verified' : undefined}
-                        />
-                      </td>
-                      <td>
-                        <div className="d-flex gap-2">
-                          <button
-                            className="btn btn-sm btn-outline-primary"
-                            title="Preview"
-                            onClick={() => handlePreview(doc.id)}
-                          >
-                            <i className="bi bi-eye me-1" />Preview
-                          </button>
-                          <button
-                            className="btn btn-sm btn-primary"
-                            title="Download"
-                            onClick={() => handleDownload(doc.id, doc.type)}
-                          >
-                            <i className="bi bi-download me-1" />Download
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="text-center py-5 text-muted">
+              <i className="bi bi-file-earmark-text fs-2" />
+              <p className="mt-2 small mb-0">Select a document above to preview it before downloading.</p>
             </div>
           )}
         </div>
-        {!isLoading && documents && documents.length > 0 && (
-          <div className="card-footer bg-white border-top py-3 d-flex justify-content-end">
-            <Link to="/student/applications" className="btn btn-primary">
-              <i className="bi bi-send me-2" />Submit to HELSB
-            </Link>
+        {preview && (
+          <div className="card-footer bg-white border-top py-3">
+            <button type="button" className="btn btn-primary" onClick={handleDownload} disabled={loadingType !== null}>
+              <i className="bi bi-download me-2" />
+              Download
+            </button>
           </div>
         )}
       </div>
-
-      {previewUrl && (
-        <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }} onClick={() => setPreviewUrl(null)}>
-          <div className="modal-dialog modal-xl modal-dialog-centered" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-content">
-              <div className="modal-header">
-                <h6 className="modal-title fw-semibold text-navy">Document Preview</h6>
-                <button type="button" className="btn-close" onClick={() => setPreviewUrl(null)} />
-              </div>
-              <div className="modal-body p-0">
-                <iframe src={previewUrl} style={{ width: '100%', height: '70vh', border: 'none' }} title="Document Preview" />
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

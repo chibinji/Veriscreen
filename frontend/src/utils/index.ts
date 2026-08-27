@@ -22,12 +22,26 @@ export function formatCurrency(amount: number, currency = 'ZMW'): string {
   return new Intl.NumberFormat('en-ZM', { style: 'currency', currency }).format(amount);
 }
 
-export function getDocumentLabel(type: DocumentType): string {
-  return DOCUMENT_TYPES[type] || type;
+export function getDocumentLabel(type: DocumentType | string | undefined): string {
+  if (!type) return '—';
+  return DOCUMENT_TYPES[type] || type.replace(/_/g, ' ');
 }
 
 export function getStatusBadge(status: string): string {
   return STATUS_BADGES[status] || 'secondary';
+}
+
+export function getHelsbStatusLabel(status: string | undefined): string {
+  const value = (status || '').toUpperCase();
+  if (value === 'APPROVED' || value === 'CONTRACT_GENERATED') return 'Approved';
+  if (value === 'REJECTED' || value === 'NOT_ELIGIBLE' || value === 'FAILED') return 'Rejected';
+  if (value === 'PENDING' || value === 'UNDER_REVIEW') return 'Submitted — waiting approval';
+  return status ? status.replace(/_/g, ' ') : '—';
+}
+
+export function isHelsbWaitingApproval(status: string | undefined): boolean {
+  const value = (status || '').toUpperCase();
+  return value === 'PENDING' || value === 'UNDER_REVIEW';
 }
 
 export function getRoleLabel(role: Role): string {

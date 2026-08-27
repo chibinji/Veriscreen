@@ -39,6 +39,7 @@ public class SecurityConfig {
                                 ApiPaths.API_V1,
                                 ApiPaths.AUTH + "/login",
                                 ApiPaths.LEGACY_AUTH + "/login",
+                                ApiPaths.VERIFY + "/**",
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**")

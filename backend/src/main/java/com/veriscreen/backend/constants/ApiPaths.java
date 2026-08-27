@@ -14,6 +14,9 @@ public final class ApiPaths {
     public static final String LEGACY_AUTH = "/api/auth";
     public static final String LEGACY_STUDENT = "/api/student";
 
+    /** Public document verification (no student PII) */
+    public static final String VERIFY = "/api/verify";
+
     private ApiPaths() {
     }
 }

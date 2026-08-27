@@ -1,6 +1,6 @@
 import React from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
-import { colors } from '../theme';
+import { colors, radii } from '../theme';
 
 export function ErrorBanner({ message }: { message?: string | null }) {
   if (!message) return null;
@@ -32,7 +32,7 @@ export function EmptyState({ title, detail }: { title: string; detail?: string }
 const styles = StyleSheet.create({
   error: {
     backgroundColor: '#fdecec',
-    borderRadius: 12,
+    borderRadius: radii.control,
     padding: 12,
     marginBottom: 12,
   },

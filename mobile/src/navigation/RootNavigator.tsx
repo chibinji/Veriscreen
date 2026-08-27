@@ -5,7 +5,9 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../auth/AuthContext';
+import { hasSeenOnboarding, markOnboardingSeen } from '../auth/storage';
 import LoginScreen from '../screens/LoginScreen';
+import OnboardingScreen from '../screens/OnboardingScreen';
 import DashboardScreen from '../screens/DashboardScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import DocumentsScreen from '../screens/DocumentsScreen';
@@ -67,8 +69,22 @@ function StudentTabs() {
 
 export default function RootNavigator() {
   const { user, ready } = useAuth();
+  const [onboardingReady, setOnboardingReady] = React.useState(false);
+  const [showOnboarding, setShowOnboarding] = React.useState(false);
 
-  if (!ready) {
+  React.useEffect(() => {
+    hasSeenOnboarding()
+      .then((seen) => setShowOnboarding(!seen))
+      .catch(() => setShowOnboarding(true))
+      .finally(() => setOnboardingReady(true));
+  }, []);
+
+  const finishOnboarding = React.useCallback(async () => {
+    await markOnboardingSeen();
+    setShowOnboarding(false);
+  }, []);
+
+  if (!ready || !onboardingReady) {
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.surface }}>
         <ActivityIndicator color={colors.indigo} />
@@ -79,7 +95,11 @@ export default function RootNavigator() {
   return (
     <NavigationContainer theme={navTheme}>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {user ? (
+        {showOnboarding ? (
+          <Stack.Screen name="Onboarding" options={{ animation: 'fade' }}>
+            {() => <OnboardingScreen onFinished={finishOnboarding} />}
+          </Stack.Screen>
+        ) : user ? (
           <Stack.Screen name="Student" component={StudentTabs} />
         ) : (
           <Stack.Screen name="Login" component={LoginScreen} />

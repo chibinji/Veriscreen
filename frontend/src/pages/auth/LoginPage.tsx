@@ -7,8 +7,9 @@ import { z } from 'zod';
 import { authService } from '../../services/authService';
 import { useAuthStore } from '../../store/authStore';
 import { getErrorMessage, getRoleDashboard, getRoleBasePath } from '../../utils';
+import { APP_NAME } from '../../constants';
 import AlertMessage from '../../components/common/AlertMessage';
-import BrandLogo from '../../components/brand/BrandLogo';
+import veriscreenLogo from '../../assets/veriscreen-logo.jpg';
 import type { Role } from '../../types';
 
 const schema = z.object({
@@ -67,7 +68,18 @@ const LoginPage: React.FC = () => {
   return (
     <div>
       <div className="text-center mb-4">
-        <BrandLogo size="lg" className="justify-content-center mb-3" />
+        <div className="d-flex flex-column align-items-center gap-2 mb-3">
+          <img
+            src={veriscreenLogo}
+            alt="VeriScreen"
+            width={88}
+            height={88}
+            style={{ objectFit: 'contain' }}
+          />
+          <span className="fw-bold text-navy" style={{ fontSize: '1.65rem', letterSpacing: '-0.02em' }}>
+            {APP_NAME}
+          </span>
+        </div>
         <h4 className="fw-bold mb-1 text-navy">Sign in</h4>
         <p className="text-muted small mb-0">Secure academic document verification</p>
       </div>

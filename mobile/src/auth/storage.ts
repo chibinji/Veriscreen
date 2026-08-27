@@ -3,6 +3,7 @@ import type { User } from '../types';
 
 const TOKEN_KEY = 'veriscreen_token';
 const USER_KEY = 'veriscreen_user';
+const ONBOARDING_KEY = 'veriscreen_onboarding_v2';
 
 export async function saveSession(token: string, user: User): Promise<void> {
   await SecureStore.setItemAsync(TOKEN_KEY, token);
@@ -23,4 +24,17 @@ export async function loadSession(): Promise<{ token: string; user: User } | nul
 export async function clearSession(): Promise<void> {
   await SecureStore.deleteItemAsync(TOKEN_KEY);
   await SecureStore.deleteItemAsync(USER_KEY);
+}
+
+export async function hasSeenOnboarding(): Promise<boolean> {
+  const value = await SecureStore.getItemAsync(ONBOARDING_KEY);
+  return value === '1';
+}
+
+export async function markOnboardingSeen(): Promise<void> {
+  await SecureStore.setItemAsync(ONBOARDING_KEY, '1');
+}
+
+export async function clearOnboardingSeen(): Promise<void> {
+  await SecureStore.deleteItemAsync(ONBOARDING_KEY);
 }

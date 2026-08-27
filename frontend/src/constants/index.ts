@@ -6,11 +6,15 @@ export const API_ENDPOINTS = {
   LOGIN: '/api/v1/auth/login',
   ME_PROFILE: '/api/v1/students/me/profile',
   ME_DOCUMENTS: '/api/v1/students/me/documents',
+  GENERATE_DOCUMENT: (type: string) => `/api/v1/students/me/documents/generate/${type}`,
+  DOWNLOAD_DOCUMENT: (documentId: string) => `/api/v1/students/me/documents/${encodeURIComponent(documentId)}/download`,
+  VERIFY_DOCUMENT: (documentId: string) => `/api/verify/${encodeURIComponent(documentId)}`,
   ME_REGISTRATIONS: '/api/v1/students/me/registrations',
   ME_FEES: '/api/v1/students/me/fees',
   ME_EXAMINATIONS: '/api/v1/students/me/examinations',
   ME_ACADEMIC_RESULTS: '/api/v1/students/me/academic-results',
   ME_HELSB: '/api/v1/students/me/helsb',
+  SUBMIT_HELSB: '/api/v1/students/me/helsb/submit',
 } as const;
 
 export const TOKEN_KEY = 'veriscreen_token';
@@ -26,16 +30,22 @@ export const ROLES = {
 
 export const DOCUMENT_TYPES: Record<string, string> = {
   TRANSCRIPT: 'Academic Transcript',
+  RESULTS: 'Academic Results',
   EXAM_SLIP: 'Examination Slip',
+  EXAMINATION_SLIP: 'Examination Slip',
   FEE_STATEMENT: 'Fee Statement',
+  PAYMENT_HISTORY: 'Payment History',
   CONFIRMATION_SLIP: 'Confirmation Slip',
   CONTRACT: 'HELSB Contract',
 };
 
 export const DOCUMENT_ICONS: Record<string, string> = {
   TRANSCRIPT: 'bi-file-earmark-text',
+  RESULTS: 'bi-file-earmark-bar-graph',
   EXAM_SLIP: 'bi-file-earmark-check',
+  EXAMINATION_SLIP: 'bi-file-earmark-check',
   FEE_STATEMENT: 'bi-receipt',
+  PAYMENT_HISTORY: 'bi-receipt',
   CONFIRMATION_SLIP: 'bi-file-earmark-person',
   CONTRACT: 'bi-file-earmark-ruled',
 };

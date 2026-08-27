@@ -6,7 +6,7 @@ import { studentApi } from '../api/studentApi';
 import { ErrorBanner, LoadingBlock } from '../components/Feedback';
 import { StatusBadge } from '../components/StatusBadge';
 import type { StudentProfile } from '../types';
-import { colors, spacing } from '../theme';
+import { colors, radii, spacing } from '../theme';
 
 export default function ProfileScreen() {
   const { token, user, logout } = useAuth();
@@ -125,8 +125,8 @@ const styles = StyleSheet.create({
   logout: {
     marginTop: spacing.md,
     backgroundColor: '#fdecec',
-    borderRadius: 12,
-    paddingVertical: 14,
+    borderRadius: radii.control,
+    paddingVertical: 16,
     alignItems: 'center',
   },
   logoutText: { color: colors.danger, fontWeight: '800' },
