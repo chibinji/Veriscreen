@@ -1,0 +1,153 @@
+@startuml VeriScreen_System_ER
+!theme plain
+skinparam linetype ortho
+skinparam classAttributeIconSize 0
+title VeriScreen System — Entity Relationship Diagram\n(university_db + veriscreen_db)
+
+' =========================================================
+' Simulated University SIS  (PostgreSQL: university_db)
+' Source of truth for academic data
+' =========================================================
+package "university_db\n(Simulated University SIS)" <<Database>> {
+
+  entity "students" as uni_students {
+    * **id** : VARCHAR <<PK>>
+    --
+    name : VARCHAR
+    nrc : VARCHAR
+    program : VARCHAR
+    enrollment_year : INTEGER
+  }
+
+  entity "registrations" as uni_registrations {
+    * **id** : BIGINT <<PK>>
+    --
+    * **student_id** : VARCHAR <<FK>>
+    academic_year : VARCHAR
+    semester : INTEGER
+    confirmed : BOOLEAN
+    registration_date : DATE
+  }
+
+  entity "fees" as uni_fees {
+    * **id** : BIGINT <<PK>>
+    --
+    * **student_id** : VARCHAR <<FK>>
+    payment_date : DATE
+    amount : NUMERIC
+    receipt_no : VARCHAR
+    outstanding_balance : NUMERIC
+  }
+
+  entity "examinations" as uni_examinations {
+    * **id** : BIGINT <<PK>>
+    --
+    * **student_id** : VARCHAR <<FK>>
+    academic_year : VARCHAR
+    eligible : BOOLEAN
+    status : VARCHAR
+  }
+
+  entity "academic_results" as uni_results {
+    * **id** : BIGINT <<PK>>
+    --
+    * **student_id** : VARCHAR <<FK>>
+    course_code : VARCHAR
+    grade : VARCHAR
+    credits : INTEGER
+  }
+
+  uni_students ||--o{ uni_registrations : "has"
+  uni_students ||--o{ uni_fees : "has"
+  uni_students ||--o{ uni_examinations : "has"
+  uni_students ||--o{ uni_results : "has"
+}
+
+' =========================================================
+' VeriScreen application DB  (PostgreSQL: veriscreen_db)
+' Synced academic cache + HELSB + auth password
+' =========================================================
+package "veriscreen_db\n(VeriScreen Backend)" <<Database>> {
+
+  entity "students" as vs_students {
+    * **id** : VARCHAR <<PK>>
+    --
+    name : VARCHAR
+    nrc : VARCHAR
+    program : VARCHAR
+    enrollment_year : INTEGER
+    password : VARCHAR
+  }
+
+  entity "registrations" as vs_registrations {
+    * **id** : BIGINT <<PK>>
+    --
+    * **student_id** : VARCHAR <<FK>>
+    academic_year : VARCHAR
+    semester : INTEGER
+    confirmed : BOOLEAN
+    registration_date : DATE
+  }
+
+  entity "fees" as vs_fees {
+    * **id** : BIGINT <<PK>>
+    --
+    * **student_id** : VARCHAR <<FK>>
+    payment_date : DATE
+    amount : NUMERIC
+    receipt_no : VARCHAR
+    outstanding_balance : NUMERIC
+  }
+
+  entity "examinations" as vs_examinations {
+    * **id** : BIGINT <<PK>>
+    --
+    * **student_id** : VARCHAR <<FK>>
+    academic_year : VARCHAR
+    eligible : BOOLEAN
+    status : VARCHAR
+  }
+
+  entity "academic_results" as vs_results {
+    * **id** : BIGINT <<PK>>
+    --
+    * **student_id** : VARCHAR <<FK>>
+    course_code : VARCHAR
+    grade : VARCHAR
+    credits : INTEGER
+  }
+
+  entity "helsb_applications" as vs_helsb {
+    * **id** : BIGINT <<PK>>
+    --
+    * **student_id** : VARCHAR <<FK>>
+    application_status : VARCHAR
+    payment_status : VARCHAR
+    screening_result : VARCHAR
+    contract_details : VARCHAR
+  }
+
+  vs_students ||--o{ vs_registrations : "has"
+  vs_students ||--o{ vs_fees : "has"
+  vs_students ||--o{ vs_examinations : "has"
+  vs_students ||--o{ vs_results : "has"
+  vs_students ||--o{ vs_helsb : "has"
+}
+
+' Logical integration (not a DB foreign key across databases)
+uni_students ..> vs_students : "sync by student id\n(UniversitySyncService)"
+
+note right of uni_students
+  **Source of truth**
+  Academic data owned by SIS.
+  No password stored here.
+end note
+
+note right of vs_students
+  **Screening cache**
+  Academic rows pulled from SIS.
+  password = VeriScreen JWT login (BCrypt).
+  helsb_applications owned by VeriScreen.
+end note
+
+@enduml

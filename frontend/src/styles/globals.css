@@ -1,0 +1,225 @@
+/* ─── VeriScreen Global Styles ─────────────────────────────────────────── */
+
+:root {
+  --vs-sidebar-width: 260px;
+  --vs-topbar-height: 60px;
+  --vs-indigo: #2c3d8f;
+  --vs-gold: #c9a227;
+  --vs-navy: #0b1d36;
+  --vs-lapis: #1d5aa6;
+  --vs-ink: #121826;
+  --vs-surface: #f4f6f9;
+
+  --bs-primary: #2c3d8f;
+  --bs-primary-rgb: 44, 61, 143;
+  --bs-link-color: #2c3d8f;
+  --bs-link-hover-color: #243275;
+  --bs-body-color: #121826;
+  --bs-body-bg: #f4f6f9;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Body */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+  background-color: var(--vs-surface);
+  color: var(--vs-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Brand */
+.brand-wordmark {
+  color: var(--vs-indigo);
+  line-height: 1.1;
+}
+
+.text-navy { color: var(--vs-navy) !important; }
+.text-indigo { color: var(--vs-indigo) !important; }
+.text-gold { color: var(--vs-gold) !important; }
+.text-lapis { color: var(--vs-lapis) !important; }
+.bg-lapis { background-color: var(--vs-lapis) !important; }
+.bg-indigo { background-color: var(--vs-indigo) !important; }
+
+.btn-primary {
+  background-color: var(--vs-indigo);
+  border-color: var(--vs-indigo);
+}
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: #243275;
+  border-color: #243275;
+}
+.btn-outline-primary {
+  color: var(--vs-indigo);
+  border-color: var(--vs-indigo);
+}
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+  background-color: var(--vs-indigo);
+  border-color: var(--vs-indigo);
+  color: #fff;
+}
+
+/* Cursor pointer utility */
+.cursor-pointer {
+  cursor: pointer;
+}
+
+/* Letter spacing utility */
+.ls-1 {
+  letter-spacing: 0.05em;
+}
+
+/* Sidebar scrollbar */
+.sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 2px;
+}
+
+/* Nav link active override — ensure white text on primary background */
+.sidebar .nav-link.active,
+.sidebar .nav-link.bg-primary {
+  color: #fff !important;
+  background-color: var(--vs-indigo) !important;
+}
+
+.sidebar .nav-link:not(.bg-primary):hover {
+  background-color: rgba(44, 61, 143, 0.06);
+  color: var(--vs-indigo);
+}
+
+/* Card hover lift */
+.card-hover {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1) !important;
+}
+
+.card {
+  border-radius: 0.75rem;
+}
+
+.card-header {
+  border-top-left-radius: 0.75rem !important;
+  border-top-right-radius: 0.75rem !important;
+}
+
+/* Table row transitions */
+.table-hover > tbody > tr {
+  transition: background-color 0.1s ease;
+}
+
+.table thead th {
+  color: var(--vs-navy);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Badge subtle variants */
+.bg-primary-subtle { background-color: #dce1f5 !important; }
+.bg-success-subtle { background-color: #d1e7dd !important; }
+.bg-danger-subtle  { background-color: #f8d7da !important; }
+.bg-warning-subtle { background-color: #fff3cd !important; }
+.bg-info-subtle    { background-color: #d0efff !important; }
+.bg-secondary-subtle { background-color: #e2e3e5 !important; }
+
+.text-primary { color: var(--vs-indigo) !important; }
+
+/* Input focus ring */
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--vs-indigo);
+  box-shadow: 0 0 0 0.15rem rgba(44, 61, 143, 0.2);
+}
+
+/* Code styling */
+code {
+  font-size: 0.8rem;
+  color: var(--vs-navy);
+  background: #eef1f6;
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+}
+
+/* Pagination */
+.pagination .page-link {
+  color: var(--vs-indigo);
+  border-color: #dee2e6;
+}
+.pagination .page-item.active .page-link {
+  background-color: var(--vs-indigo);
+  border-color: var(--vs-indigo);
+}
+
+/* Responsive layout adjustments */
+@media (max-width: 991.98px) {
+  .sidebar {
+    box-shadow: 0.5rem 0 1.5rem rgba(0, 0, 0, 0.15);
+  }
+  
+  /* On mobile the sidebar overlays, so no margin on main content */
+  .main-content {
+    margin-left: 0 !important;
+  }
+}
+
+/* Animated spinner pulse */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+.pulse {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Smooth modal transitions */
+.modal.show {
+  animation: fadeIn 0.15s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Progress bar */
+.progress {
+  border-radius: 100px;
+  background-color: #e9ecef;
+}
+.progress-bar {
+  transition: width 0.6s ease;
+}
+
+/* Alert tweaks */
+.alert {
+  border-radius: 0.5rem;
+}
+
+/* Print styles */
+@media print {
+  .sidebar,
+  .navbar,
+  .btn,
+  footer {
+    display: none !important;
+  }
+  .main-content {
+    margin: 0 !important;
+  }
+}

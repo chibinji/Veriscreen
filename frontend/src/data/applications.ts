@@ -1,0 +1,121 @@
+import type { Application, BankDetails, Payment, ScreeningResult } from '../types';
+import { documents } from './documents';
+
+export const applications: Application[] = [
+  {
+    id: 1,
+    applicationNumber: 'HELSB-2026-00412',
+    studentNumber: '2022030346',
+    studentName: 'Nosiku Mukuka',
+    program: 'Bachelor of Science in Computer Science',
+    faculty: 'School of Natural and Applied Sciences',
+    yearOfStudy: 4,
+    status: 'UNDER_REVIEW',
+    submittedAt: '2026-03-12T10:05:00.000Z',
+    documents: documents.filter((d) => d.studentNumber === '2022030346'),
+  },
+  {
+    id: 2,
+    applicationNumber: 'HELSB-2026-00188',
+    studentNumber: '2021987654',
+    studentName: 'Lillian Phiri',
+    program: 'Bachelor of Education (Mathematics)',
+    faculty: 'School of Education',
+    yearOfStudy: 5,
+    status: 'CONTRACT_GENERATED',
+    submittedAt: '2026-02-16T09:30:00.000Z',
+    reviewedAt: '2026-04-20T14:10:00.000Z',
+    reviewedBy: 'Mwila Kabwe',
+    notes: 'Strong academic standing. Contract generated and ready for acceptance.',
+    documents: documents.filter((d) => d.studentNumber === '2021987654' && d.type !== 'CONTRACT'),
+  },
+  {
+    id: 3,
+    applicationNumber: 'HELSB-2026-00301',
+    studentNumber: '2021555123',
+    studentName: 'Patrick Tembo',
+    program: 'Bachelor of Laws',
+    faculty: 'School of Law',
+    yearOfStudy: 3,
+    status: 'PENDING',
+    submittedAt: '2026-04-02T15:45:00.000Z',
+    documents: [],
+  },
+  {
+    id: 4,
+    applicationNumber: 'HELSB-2026-00277',
+    studentNumber: '2021777888',
+    studentName: 'Thandiwe Mwansa',
+    program: 'Bachelor of Medicine and Surgery',
+    faculty: 'School of Medicine',
+    yearOfStudy: 4,
+    status: 'APPROVED',
+    submittedAt: '2026-03-01T11:00:00.000Z',
+    reviewedAt: '2026-04-18T09:20:00.000Z',
+    reviewedBy: 'Mwila Kabwe',
+    notes: 'Eligible. Awaiting contract generation.',
+    documents: [],
+  },
+  {
+    id: 5,
+    applicationNumber: 'HELSB-2026-00102',
+    studentNumber: '2021444001',
+    studentName: 'Joseph Zulu',
+    program: 'Bachelor of Accountancy',
+    faculty: 'School of Business',
+    yearOfStudy: 2,
+    status: 'REJECTED',
+    submittedAt: '2026-01-22T08:15:00.000Z',
+    reviewedAt: '2026-02-10T16:00:00.000Z',
+    reviewedBy: 'Mwila Kabwe',
+    notes: 'Incomplete fee payment history. Student may re-apply after clearing outstanding balances.',
+    documents: [],
+  },
+];
+
+export const payments: Payment[] = [
+  {
+    id: 1,
+    applicationId: 2,
+    amount: 250,
+    currency: 'ZMW',
+    status: 'COMPLETED',
+    transactionRef: 'HELSB-PAY-188-90421',
+    paidAt: '2026-02-18T10:12:00.000Z',
+  },
+];
+
+export const bankDetails: BankDetails[] = [
+  {
+    id: 1,
+    bankName: 'Zanaco',
+    accountNumber: '5678123409',
+    accountName: 'Lillian Phiri',
+    branch: 'Cairo Road, Lusaka',
+    sortCode: '010044',
+    applicationId: 2,
+  },
+];
+
+export const screeningResults: ScreeningResult[] = [
+  {
+    id: 1,
+    applicationId: 2,
+    studentNumber: '2021987654',
+    passed: true,
+    score: 91,
+    remarks: 'Confirmed registration, full fee payment, and strong academic standing. Approved for HELSB loan support.',
+    screenedAt: '2026-04-20T14:10:00.000Z',
+    screenedBy: 'Automated Screening Engine',
+  },
+  {
+    id: 2,
+    applicationId: 4,
+    studentNumber: '2021777888',
+    passed: true,
+    score: 84,
+    remarks: 'Academic records verified. Eligible pending contract generation.',
+    screenedAt: '2026-04-18T09:20:00.000Z',
+    screenedBy: 'Automated Screening Engine',
+  },
+];
