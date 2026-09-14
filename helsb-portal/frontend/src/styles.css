@@ -1,0 +1,202 @@
+:root {
+  --helsb-navy: #071e42;
+  --helsb-blue: #0b2c5f;
+  --helsb-blue-mid: #123a7a;
+  --helsb-orange: #e87722;
+  --helsb-orange-dark: #c45f12;
+  --helsb-cream: #f4f6fb;
+}
+body {
+  background: var(--helsb-cream);
+  color: #10203a;
+  font-family: 'Segoe UI', sans-serif;
+}
+.portal-body { min-height: 100vh; }
+.helsb-topbar {
+  background: linear-gradient(90deg, var(--helsb-navy), var(--helsb-blue));
+  color: white;
+}
+.brand-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: white;
+  text-decoration: none;
+}
+.brand-link small {
+  display: block;
+  font-size: 0.72rem;
+  opacity: 0.85;
+  font-weight: 500;
+}
+.nav-logo {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  background: white;
+  border-radius: 10px;
+  padding: 3px;
+}
+.officer-name { font-weight: 600; }
+.btn-helsb {
+  background: var(--helsb-orange);
+  border: none;
+  color: white;
+  border-radius: 999px;
+  padding: 0.55rem 1.2rem;
+  font-weight: 700;
+}
+.btn-helsb:hover, .btn-helsb:disabled { background: var(--helsb-orange-dark); color: white; }
+.btn-outline-helsb {
+  border: 1.5px solid var(--helsb-blue);
+  color: var(--helsb-blue);
+  border-radius: 999px;
+  padding: 0.5rem 1.1rem;
+  font-weight: 700;
+}
+.btn-outline-helsb:hover { background: var(--helsb-blue); color: white; }
+.pill {
+  border-radius: 999px;
+  padding: 0.2rem 0.7rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+.badge-pending { background: #fff4e5; color: #c45f12; }
+.badge-review { background: #e7eefc; color: #123a7a; }
+.badge-confirmed { background: #e6f6ec; color: #157347; }
+.badge-rejected { background: #fde8e8; color: #b42318; }
+.card { border-radius: 18px; border: none; }
+.form-control, .form-select { border-radius: 14px; padding: 0.7rem 1rem; }
+.page-title { font-weight: 800; color: var(--helsb-navy); }
+.page-lead { color: #5b6b82; margin-bottom: 1.4rem; }
+.back-link { color: var(--helsb-blue); font-weight: 600; text-decoration: none; }
+.uni-card, .school-card {
+  display: block;
+  background: white;
+  border-radius: 20px;
+  padding: 1.3rem 1.4rem;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: 0 10px 24px rgba(7, 30, 66, 0.08);
+  height: 100%;
+  border-top: 5px solid var(--helsb-orange);
+}
+.uni-card:hover { transform: translateY(-2px); color: inherit; }
+.uni-abbr {
+  display: inline-block;
+  background: var(--helsb-blue);
+  color: white;
+  font-weight: 800;
+  border-radius: 999px;
+  padding: 0.15rem 0.7rem;
+  font-size: 0.8rem;
+  margin-bottom: 0.7rem;
+}
+.uni-card h3, .school-card h3 {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--helsb-navy);
+  margin-bottom: 0.35rem;
+}
+.stat-banner {
+  background: var(--helsb-blue);
+  color: white;
+  border-radius: 16px;
+  padding: 1rem 1.2rem;
+  font-size: 1.05rem;
+}
+.loan-count {
+  background: #fff4e5;
+  color: var(--helsb-orange-dark);
+  font-weight: 800;
+  border-radius: 999px;
+  padding: 0.2rem 0.7rem;
+}
+.loan-pill {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 0.2rem 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 800;
+  margin-top: 0.35rem;
+}
+.loan-50 { background: #fff4e5; color: #c45f12; }
+.loan-75 { background: #e7eefc; color: #123a7a; }
+.loan-100 { background: #e6f6ec; color: #157347; }
+.student-row {
+  display: block;
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid #edf1f6;
+  text-decoration: none;
+  color: inherit;
+}
+.student-row.active, .student-row:hover { background: #f7f9fd; }
+.document-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  border: 1px solid #e6ebf3;
+  border-radius: 14px;
+  padding: 0.75rem 0.9rem;
+}
+.login-shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(160deg, var(--helsb-navy) 0%, var(--helsb-blue-mid) 55%, #163f86 100%);
+  padding: 24px;
+}
+.login-card {
+  width: min(420px, 100%);
+  background: white;
+  border-radius: 24px;
+  padding: 2rem 1.8rem 2.1rem;
+  box-shadow: 0 24px 50px rgba(0, 0, 0, 0.25);
+  text-align: center;
+}
+.login-logo {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  margin-bottom: 0.6rem;
+}
+.login-card h1 {
+  color: var(--helsb-navy);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.2rem;
+}
+.login-subtitle {
+  color: var(--helsb-orange);
+  font-size: 0.92rem;
+  font-weight: 600;
+  margin-bottom: 1.4rem;
+}
+.login-card .form-label, .login-card .form-control { text-align: left; }
+.doc-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(7, 30, 66, 0.55);
+  display: grid;
+  place-items: center;
+  z-index: 40;
+  padding: 20px;
+}
+.doc-modal {
+  width: min(720px, 100%);
+  background: white;
+  border-radius: 20px;
+  padding: 1.3rem;
+}
+.doc-frame {
+  width: 100%;
+  height: 360px;
+  border: 1px solid #e6ebf3;
+  border-radius: 12px;
+}
+.doc-placeholder {
+  background: #f7f9fd;
+  border-radius: 14px;
+  padding: 1.2rem;
+}

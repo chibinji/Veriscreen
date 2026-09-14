@@ -1,11 +1,14 @@
 # VeriScreen
 
-Student web app + Spring Boot backend for verified academic document access and screening.
+Student web app + Spring Boot backend for verified academic document access and screening, now connected to a simulated university SIS and a separate HELSB officer portal.
 
 ## Documentation
 
 | Document | Description |
 |----------|-------------|
+| [docs/architecture/overview.md](docs/architecture/overview.md) | How VeriScreen, SIS, and HELSB connect |
+| [docs/api/integration.md](docs/api/integration.md) | Cross-system APIs |
+| [docs/database/overview.md](docs/database/overview.md) | Separate databases |
 | [docs/VeriScreen-Backend-Guide.tex](docs/VeriScreen-Backend-Guide.tex) | Full architecture guide (compile to PDF with `pdflatex`) |
 | [docs/CODE_REVIEW_CHECKLIST.md](docs/CODE_REVIEW_CHECKLIST.md) | Pre-commit SOLID / security checklist |
 | [docs/database-least-privilege.sql](docs/database-least-privilege.sql) | PostgreSQL least-privilege user setup |
@@ -15,12 +18,29 @@ Student web app + Spring Boot backend for verified academic document access and 
 
 | Folder | Description |
 |--------|-------------|
-| `backend/` | Spring Boot REST API (JWT, PostgreSQL, OpenAPI) |
-| `frontend/` | React + TypeScript student web portal |
-| `mobile/` | Expo (React Native) student mobile app |
+| `backend/` | VeriScreen Spring Boot API (JWT, PostgreSQL, PDFs, QR) |
+| `frontend/` | VeriScreen React student web portal |
+| `mobile/` | Expo student mobile app |
+| `simulated-student-system/` | Authoritative student records + registrar UI |
+| `helsb-portal/` | HELSB officer API and portal |
 | `docs/` | Architecture guides and project documents |
 
 ## Quick start
+
+Create three databases:
+
+```sql
+CREATE DATABASE veriscreen_db;
+CREATE DATABASE sis_db;
+CREATE DATABASE helsb_db;
+```
+
+Then start in this order:
+
+1. Simulated SIS backend (`simulated-student-system/backend`, port **8082**)
+2. HELSB backend (`helsb-portal/backend`, port **8083**)
+3. VeriScreen backend (`backend`, port **8081**)
+4. Frontends: VeriScreen `:5173`, HELSB `:5174`, SIS `:5175`
 
 ### 1. Backend
 
@@ -35,8 +55,8 @@ Student web app + Spring Boot backend for verified academic document access and 
    mvnw.cmd spring-boot:run
    ```
 
-API: `http://localhost:8080`  
-Swagger: `http://localhost:8080/swagger-ui.html`
+API: `http://localhost:8081`  
+Swagger: `http://localhost:8081/swagger-ui.html`
 
 ### 2. Frontend
 
@@ -53,7 +73,7 @@ Swagger: `http://localhost:8080/swagger-ui.html`
 | App | URL |
 |-----|-----|
 | Frontend (web UI) | `http://localhost:5173` |
-| Backend (API) | `http://localhost:8080` |
+| Backend (API) | `http://localhost:8081` |
 
 In dev, the frontend **proxies** `/api` requests to the backend, so you don't need to worry about different ports in the browser.
 
@@ -71,6 +91,33 @@ In dev, the frontend **proxies** `/api` requests to the backend, so you don't ne
 3. Scan the QR code with Expo Go, or press `a` for an Android emulator.
 
 A phone cannot use `localhost`. The app uses your PC's LAN IP on port **8081** by default. Details: [mobile/README.md](mobile/README.md).
+
+### 4. HELSB officer portal
+
+```bash
+cd helsb-portal/frontend
+npm install
+npm run dev
+```
+
+Open http://localhost:5174
+
+| Username | Password |
+|----------|----------|
+| `mwaka.chanda@helsb.zm` | `password123` |
+| `chanda.phiri@helsb.zm` | `password123` |
+
+### 5. Simulated student information system
+
+```bash
+cd simulated-student-system/frontend
+npm install
+npm run dev
+```
+
+Open http://localhost:5175 — registrar username `registrar`, password `password123`.
+
+VeriScreen reads academic data from this system over HTTP. It does not connect to `sis_db` directly.
 
 ## Mock student accounts
 

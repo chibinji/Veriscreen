@@ -1,0 +1,10 @@
+package com.veriscreen.helsb.dto;
+
+import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
+
+@Data
+public class DecisionRequest {
+    @NotBlank
+    private String comment;
+}
