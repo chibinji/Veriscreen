@@ -7,11 +7,12 @@ import EmptyState from '../components/common/EmptyState';
 import AlertMessage from '../components/common/AlertMessage';
 import { getInitials, getRoleLabel } from '../utils';
 import { useAuthStore } from '../store/authStore';
+import { useSessionQueryKey } from '../hooks/useSessionQueryKey';
 
 const ProfilePage: React.FC = () => {
   const { user } = useAuthStore();
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ['me'],
+    queryKey: useSessionQueryKey('me'),
     queryFn: usersApi.getMe,
   });
 

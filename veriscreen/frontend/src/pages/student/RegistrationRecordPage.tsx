@@ -3,14 +3,15 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { usersApi } from '../../api';
 import { studentService } from '../../services/studentService';
+import { useSessionQueryKey } from '../../hooks/useSessionQueryKey';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import AlertMessage from '../../components/common/AlertMessage';
 import { getErrorMessage } from '../../utils';
 import { bachelorProgramme, fullName, gerSession, titleYear } from './recordsFormat';
 
 const RegistrationRecordPage: React.FC = () => {
-  const profileQuery = useQuery({ queryKey: ['student-profile'], queryFn: studentService.getProfile });
-  const regsQuery = useQuery({ queryKey: ['registrations'], queryFn: () => usersApi.getRegistrations() });
+  const profileQuery = useQuery({ queryKey: useSessionQueryKey('student-profile'), queryFn: studentService.getProfile });
+  const regsQuery = useQuery({ queryKey: useSessionQueryKey('registrations'), queryFn: () => usersApi.getRegistrations() });
 
   const profile = profileQuery.data;
   const latest = regsQuery.data?.[0];

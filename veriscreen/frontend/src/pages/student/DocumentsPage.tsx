@@ -10,13 +10,14 @@ import EmptyState from '../../components/common/EmptyState';
 import AlertMessage from '../../components/common/AlertMessage';
 import { formatDateTime, getDocumentLabel } from '../../utils';
 import { DOCUMENT_ICONS } from '../../constants';
+import { useSessionQueryKey } from '../../hooks/useSessionQueryKey';
 
 const DocumentsPage: React.FC = () => {
   const [error, setError] = useState('');
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const { data: documents, isLoading, isError } = useQuery({
-    queryKey: ['my-documents'],
+    queryKey: useSessionQueryKey('my-documents'),
     queryFn: documentService.getMyDocuments,
   });
 
@@ -37,11 +38,7 @@ const DocumentsPage: React.FC = () => {
     <div>
       <PageHeader
         title="My Documents"
-<<<<<<< HEAD:veriscreen/frontend/src/pages/student/DocumentsPage.tsx
         subtitle="Preview and download official documents."
-=======
-        subtitle="Preview and download your verified academic documents."
->>>>>>> 8b452b7f50d2ea25c209b6f89403623c1d980c82:frontend/src/pages/student/DocumentsPage.tsx
         breadcrumbs={[{ label: 'Dashboard', path: '/student/dashboard' }, { label: 'Documents' }]}
       />
 

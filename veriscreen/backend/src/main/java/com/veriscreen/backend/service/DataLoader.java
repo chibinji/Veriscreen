@@ -65,21 +65,12 @@ public class DataLoader implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) {
-<<<<<<< HEAD:veriscreen/backend/src/main/java/com/veriscreen/backend/service/DataLoader.java
         if (studentRepository.count() == 0) {
             seedSamuelMwanza();
             seedNosikuMukuka();
             seedGraceBanda();
             seedPeterZulu();
             log.info("Seeded {} mock students with varied screening scenarios", studentRepository.count());
-=======
-        if (universityProperties.getSync().isEnabled()) {
-            log.info("Skipping local academic DataLoader seed (university.sync.enabled=true)");
-            return;
-        }
-        if (studentRepository.count() > 0) {
-            return;
->>>>>>> 8b452b7f50d2ea25c209b6f89403623c1d980c82:backend/src/main/java/com/veriscreen/backend/service/DataLoader.java
         }
         backfillStudentContactsAndLoans();
     }

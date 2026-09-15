@@ -11,13 +11,10 @@ export const API_ENDPOINTS = {
   ME_EXAMINATIONS: '/api/v1/students/me/examinations',
   ME_ACADEMIC_RESULTS: '/api/v1/students/me/academic-results',
   ME_HELSB: '/api/v1/students/me/helsb',
-<<<<<<< HEAD:veriscreen/frontend/src/constants/index.ts
   SUBMIT_HELSB: '/api/v1/students/me/helsb/submit',
   ME_NOTIFICATIONS: '/api/v1/students/me/notifications',
   DOWNLOAD_HELSB_CONTRACT: (id: number) => `/api/v1/students/me/helsb/${id}/contract`,
   EMAIL_HELSB_CONTRACT: (id: number) => `/api/v1/students/me/helsb/${id}/contract/email`,
-=======
->>>>>>> 8b452b7f50d2ea25c209b6f89403623c1d980c82:frontend/src/constants/index.ts
 } as const;
 
 export const TOKEN_KEY = 'veriscreen_token';

@@ -225,6 +225,14 @@ body {
   color: var(--vs-navy);
 }
 
+.page-header h2 .vs-welcome {
+  font-weight: 400;
+}
+
+.page-header h2 .vs-welcome strong {
+  font-weight: 800;
+}
+
 .table-hover > tbody > tr {
   transition: background-color 0.1s ease;
 }

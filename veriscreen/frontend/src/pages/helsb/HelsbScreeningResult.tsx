@@ -1,6 +1,7 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { helsbService } from '../../services/helsbService';
+import { useSessionQueryKey } from '../../hooks/useSessionQueryKey';
 import PageHeader from '../../components/common/PageHeader';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import EmptyState from '../../components/common/EmptyState';
@@ -9,7 +10,7 @@ import { formatDateTime } from '../../utils';
 
 const HelsbScreeningResult: React.FC = () => {
   const { data: application, isLoading: appLoading, isError: appError } = useQuery({
-    queryKey: ['my-application'],
+    queryKey: useSessionQueryKey('my-application'),
     queryFn: helsbService.getMyApplication,
     retry: false,
   });

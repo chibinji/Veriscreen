@@ -9,10 +9,8 @@ import { useAuthStore } from '../../store/authStore';
 import { getErrorMessage, getRoleDashboard, getRoleBasePath } from '../../utils';
 import AlertMessage from '../../components/common/AlertMessage';
 import BrandLogo from '../../components/brand/BrandLogo';
-<<<<<<< HEAD:veriscreen/frontend/src/pages/auth/LoginPage.tsx
 import veriscreenMark from '../../assets/veriscreen-mark.jpg';
-=======
->>>>>>> 8b452b7f50d2ea25c209b6f89403623c1d980c82:frontend/src/pages/auth/LoginPage.tsx
+import { APP_NAME } from '../../constants';
 import type { Role } from '../../types';
 
 const schema = z.object({
@@ -69,21 +67,12 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-<<<<<<< HEAD:veriscreen/frontend/src/pages/auth/LoginPage.tsx
     <div className="login-split">
       <section className="login-split__form">
         <div className="login-split__form-inner">
           <BrandLogo size="sm" className="mb-4 login-split__logo" />
           <h1 className="login-split__title">Sign in</h1>
           <p className="login-split__subtitle">Secure academic document verification</p>
-=======
-    <div>
-      <div className="text-center mb-4">
-        <BrandLogo size="lg" className="justify-content-center mb-3" />
-        <h4 className="fw-bold mb-1 text-navy">Sign in</h4>
-        <p className="text-muted small mb-0">Secure academic document verification</p>
-      </div>
->>>>>>> 8b452b7f50d2ea25c209b6f89403623c1d980c82:frontend/src/pages/auth/LoginPage.tsx
 
           {registeredMessage && <AlertMessage type="success" message={registeredMessage} />}
           {error && <AlertMessage type="danger" message={error} onDismiss={() => setError('')} />}

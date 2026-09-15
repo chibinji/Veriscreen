@@ -103,7 +103,7 @@ export function splitName(fullName: string | undefined | null): { firstName: str
   const parts = (fullName || '').trim().split(/\s+/).filter(Boolean);
   if (parts.length === 0) return { firstName: 'Student', lastName: '' };
   if (parts.length === 1) return { firstName: parts[0], lastName: '' };
-  return { firstName: parts[0], lastName: parts.slice(1).join(' ') };
+  return { firstName: parts.slice(0, -1).join(' '), lastName: parts[parts.length - 1] };
 }
 
 function numericId(value: string | number | undefined): number {

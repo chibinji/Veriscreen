@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { studentService } from '../../services/studentService';
+import { useSessionQueryKey } from '../../hooks/useSessionQueryKey';
 import PageHeader from '../../components/common/PageHeader';
 import StatusBadge from '../../components/common/StatusBadge';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
@@ -23,7 +24,7 @@ const StudentProfile: React.FC = () => {
   const [formError, setFormError] = useState('');
 
   const { data: profile, isLoading, isError, error } = useQuery({
-    queryKey: ['student-profile'],
+    queryKey: useSessionQueryKey('student-profile'),
     queryFn: studentService.getProfile,
   });
 

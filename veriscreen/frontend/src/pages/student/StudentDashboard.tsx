@@ -8,6 +8,7 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import PageHeader from '../../components/common/PageHeader';
 import StatusBadge from '../../components/common/StatusBadge';
 import { useAuthStore } from '../../store/authStore';
+import { useSessionQueryKey } from '../../hooks/useSessionQueryKey';
 import { formatDate, getDocumentLabel, getErrorMessage } from '../../utils';
 import AlertMessage from '../../components/common/AlertMessage';
 
@@ -15,22 +16,26 @@ const StudentDashboard: React.FC = () => {
   const { user } = useAuthStore();
 
   const { data: stats, isLoading: statsLoading, isError, error } = useQuery({
-    queryKey: ['student-stats'],
+    queryKey: useSessionQueryKey('student-stats'),
     queryFn: studentService.getDashboardStats,
   });
 
   const { data: documents, isLoading: docsLoading } = useQuery({
-    queryKey: ['my-documents'],
+    queryKey: useSessionQueryKey('my-documents'),
     queryFn: documentService.getMyDocuments,
   });
 
-  const firstName = user?.firstName || 'Student';
+  const studentName = [user?.firstName, user?.lastName].filter(Boolean).join(' ') || 'Student';
 
   return (
     <div>
       <PageHeader
-        title="Student Dashboard"
-        subtitle={`Welcome back, ${firstName}. Overview of your verified academic records.`}
+        title={
+          <span className="vs-welcome">
+            Welcome back, <strong>{studentName}</strong>
+          </span>
+        }
+        subtitle="Overview of your verified academic records."
       />
 
       {isError && (

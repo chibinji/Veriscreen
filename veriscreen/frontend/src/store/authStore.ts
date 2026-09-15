@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import type { User, Role } from '../types';
 import { authService } from '../services/authService';
 import { TOKEN_KEY, USER_KEY } from '../constants';
+import { queryClient } from '../queryClient';
 
 interface AuthState {
   user: User | null;
@@ -47,6 +48,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   setSession: (user, token) => {
+    queryClient.clear();
     localStorage.setItem(USER_KEY, JSON.stringify(user));
     localStorage.setItem(TOKEN_KEY, token);
     set({ user, token, isAuthenticated: true });
@@ -54,6 +56,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   logout: () => {
     authService.logout();
+    queryClient.clear();
     set({ user: null, token: null, isAuthenticated: false });
   },
 

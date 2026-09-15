@@ -30,7 +30,6 @@ export function getStatusBadge(status: string): string {
   return STATUS_BADGES[status] || 'secondary';
 }
 
-<<<<<<< HEAD:veriscreen/frontend/src/utils/index.ts
 export function getHelsbStatusLabel(status: string | undefined): string {
   const value = (status || '').toUpperCase();
   if (value === 'APPROVED' || value === 'CONFIRMED' || value === 'CONTRACT_GENERATED') return 'Approved';
@@ -49,8 +48,7 @@ export function isHelsbApproved(status: string | undefined): boolean {
   return value === 'APPROVED' || value === 'CONFIRMED' || value === 'CONTRACT_GENERATED' || value === 'COMPLETED';
 }
 
-=======
->>>>>>> 8b452b7f50d2ea25c209b6f89403623c1d980c82:frontend/src/utils/index.ts
+
 export function getRoleLabel(role: Role): string {
   const labels: Record<Role, string> = {
     STUDENT: 'Student',

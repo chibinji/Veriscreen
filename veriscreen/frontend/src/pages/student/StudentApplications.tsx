@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { documentService } from '../../services/documentService';
 import { helsbService } from '../../services/helsbService';
 import { studentService } from '../../services/studentService';
+import { useSessionQueryKey } from '../../hooks/useSessionQueryKey';
 import PageHeader from '../../components/common/PageHeader';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import StatusBadge from '../../components/common/StatusBadge';
@@ -30,17 +31,17 @@ const StudentApplications: React.FC = () => {
   const queryClient = useQueryClient();
 
   const { data: profile } = useQuery({
-    queryKey: ['my-profile'],
+    queryKey: useSessionQueryKey('my-profile'),
     queryFn: studentService.getProfile,
   });
 
   const { data: documents, isLoading: docsLoading } = useQuery({
-    queryKey: ['my-documents'],
+    queryKey: useSessionQueryKey('my-documents'),
     queryFn: documentService.getMyDocuments,
   });
 
   const { data: application, isLoading: appLoading, isError: appError } = useQuery({
-    queryKey: ['my-application'],
+    queryKey: useSessionQueryKey('my-application'),
     queryFn: helsbService.getMyApplication,
     retry: false,
     refetchInterval: (query) => {
@@ -120,7 +121,7 @@ const StudentApplications: React.FC = () => {
     <div>
       <PageHeader
         title="HELSB"
-        subtitle="Higher Education Loans and Scholarship Board ù loan status, screening and submission."
+        subtitle="Higher Education Loans and Scholarship Board ? loan status, screening and submission."
         breadcrumbs={[{ label: 'Dashboard', path: '/student/dashboard' }, { label: 'HELSB' }]}
       />
 
@@ -175,7 +176,7 @@ const StudentApplications: React.FC = () => {
                     <StatusBadge status={application?.status || 'PENDING'} label={application ? getHelsbStatusLabel(application.status) : 'Not submitted'} />
                   )}
                   <p className="small text-muted mt-2 mb-0">
-                    Screening result: {application?.screeningResult || 'ù'}
+                    Screening result: {application?.screeningResult || '?'}
                   </p>
                 </div>
               </div>
@@ -184,9 +185,9 @@ const StudentApplications: React.FC = () => {
               <div className="card border-0 shadow-sm h-100">
                 <div className="card-body">
                   <p className="text-muted small mb-1">HELSB loan number</p>
-                  <div className="fw-bold">{application?.applicationNumber || 'ù'}</div>
+                  <div className="fw-bold">{application?.applicationNumber || '?'}</div>
                   <p className="small mb-0 mt-2">
-                    Submitted: {application?.submittedAt ? 'Yes' : 'No'} ù Approved: {approved ? 'Yes' : 'No'}
+                    Submitted: {application?.submittedAt ? 'Yes' : 'No'} ? Approved: {approved ? 'Yes' : 'No'}
                   </p>
                 </div>
               </div>
@@ -210,7 +211,7 @@ const StudentApplications: React.FC = () => {
                 ].map(([label, value]) => (
                   <div className="col-sm-6 col-lg-4" key={label}>
                     <p className="text-muted small mb-1">{label}</p>
-                    <div className="fw-medium">{value || 'ù'}</div>
+                    <div className="fw-medium">{value || '?'}</div>
                   </div>
                 ))}
               </div>
@@ -227,7 +228,7 @@ const StudentApplications: React.FC = () => {
                   </div>
                 </div>
                 <button className="btn btn-primary" disabled={contractMutation.isPending} onClick={() => contractMutation.mutate()}>
-                  {contractMutation.isPending ? 'Preparingù' : 'Download contract'}
+                  {contractMutation.isPending ? 'Preparing?' : 'Download contract'}
                 </button>
               </div>
             </div>
@@ -324,7 +325,7 @@ const StudentApplications: React.FC = () => {
                   disabled={!momoPhone.trim() || submitMutation.isPending}
                   onClick={() => submitMutation.mutate()}
                 >
-                  {submitMutation.isPending ? 'Submittingù' : 'Confirm and submit'}
+                  {submitMutation.isPending ? 'Submitting?' : 'Confirm and submit'}
                 </button>
               </div>
             </div>

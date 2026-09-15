@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { usersApi } from '../../api';
 import { studentService } from '../../services/studentService';
+import { useSessionQueryKey } from '../../hooks/useSessionQueryKey';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import AlertMessage from '../../components/common/AlertMessage';
 import EmptyState from '../../components/common/EmptyState';
@@ -10,8 +11,8 @@ import { getErrorMessage } from '../../utils';
 import { groupResults } from './recordsFormat';
 
 const AcademicResultsRecordPage: React.FC = () => {
-  const profileQuery = useQuery({ queryKey: ['student-profile'], queryFn: studentService.getProfile });
-  const resultsQuery = useQuery({ queryKey: ['academic-results'], queryFn: () => usersApi.getAcademicResults() });
+  const profileQuery = useQuery({ queryKey: useSessionQueryKey('student-profile'), queryFn: studentService.getProfile });
+  const resultsQuery = useQuery({ queryKey: useSessionQueryKey('academic-results'), queryFn: () => usersApi.getAcademicResults() });
 
   const groups = groupResults(resultsQuery.data || [], profileQuery.data);
 

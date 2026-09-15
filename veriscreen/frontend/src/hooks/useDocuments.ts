@@ -1,12 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { documentsApi } from '../api';
+import { useSessionQueryKey } from './useSessionQueryKey';
 import type { DocumentType } from '../types';
 
 export function useDocuments() {
   const queryClient = useQueryClient();
+  const documentsKey = useSessionQueryKey('my-documents');
 
   const query = useQuery({
-    queryKey: ['my-documents'],
+    queryKey: documentsKey,
     queryFn: documentsApi.getDocuments,
   });
 

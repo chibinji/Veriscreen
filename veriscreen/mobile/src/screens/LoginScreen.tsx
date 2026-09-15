@@ -123,7 +123,6 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: spacing.md,
-<<<<<<< HEAD:veriscreen/mobile/src/screens/LoginScreen.tsx
     backgroundColor: 'rgba(255,255,255,0.28)',
     borderWidth: 1.5,
     borderColor: 'rgba(27,122,74,0.4)',
@@ -133,26 +132,4 @@ const styles = StyleSheet.create({
   },
   buttonDisabled: { opacity: 0.7 },
   buttonText: { color: colors.navy, fontWeight: '700', fontSize: 16 },
-=======
-    backgroundColor: colors.indigo,
-    borderRadius: 12,
-    paddingVertical: 14,
-    alignItems: 'center',
-  },
-  buttonDisabled: { opacity: 0.7 },
-  buttonText: { color: colors.white, fontWeight: '700', fontSize: 16 },
-  demoTitle: { fontWeight: '800', color: colors.navy, marginBottom: 4 },
-  demoHint: { color: colors.muted, fontSize: 12, marginBottom: 10 },
-  demoRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 10,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-  },
-  demoId: { fontWeight: '700', color: colors.indigo },
-  demoLabel: { color: colors.muted, fontSize: 12, marginTop: 2, maxWidth: 220 },
-  use: { color: colors.lapis, fontWeight: '700' },
->>>>>>> 8b452b7f50d2ea25c209b6f89403623c1d980c82:mobile/src/screens/LoginScreen.tsx
 });

@@ -17,32 +17,33 @@ public class SisClient {
     private final RestClient restClient;
 
     public SisClient(
-            @Value("${veriscreen.sis.base-url:http://localhost:8082}") String baseUrl,
-            @Value("${veriscreen.sis.api-key:sis-dev-api-key-change-me}") String apiKey) {
+            @Value("${veriscreen.sis.base-url:http://localhost:8090}") String baseUrl,
+            @Value("${veriscreen.sis.api-key:dev-shared-secret}") String apiKey) {
         this.restClient = RestClient.builder()
                 .baseUrl(trim(baseUrl))
+                .defaultHeader("X-Api-Key", apiKey)
                 .defaultHeader("X-API-Key", apiKey)
                 .build();
     }
 
     public Optional<SisModels.Student> getStudent(String studentId) {
-        return get("/api/students/" + studentId, SisModels.Student.class);
+        return get("/sis/v1/students/" + studentId, SisModels.Student.class);
     }
 
     public List<SisModels.Registration> getRegistrations(String studentId) {
-        return list("/api/students/" + studentId + "/registration", SisModels.Registration[].class);
+        return list("/sis/v1/students/" + studentId + "/registrations", SisModels.Registration[].class);
     }
 
     public List<SisModels.Result> getResults(String studentId) {
-        return list("/api/students/" + studentId + "/results", SisModels.Result[].class);
+        return list("/sis/v1/students/" + studentId + "/academic-results", SisModels.Result[].class);
     }
 
     public List<SisModels.Examination> getExaminations(String studentId) {
-        return list("/api/students/" + studentId + "/examinations", SisModels.Examination[].class);
+        return list("/sis/v1/students/" + studentId + "/examinations", SisModels.Examination[].class);
     }
 
     public List<SisModels.Payment> getPayments(String studentId) {
-        return list("/api/students/" + studentId + "/payments", SisModels.Payment[].class);
+        return list("/sis/v1/students/" + studentId + "/fees", SisModels.Payment[].class);
     }
 
     public Optional<SisModels.Snapshot> getSnapshot(String studentId) {

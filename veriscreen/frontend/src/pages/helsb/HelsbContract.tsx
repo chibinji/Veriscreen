@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { helsbService } from '../../services/helsbService';
+import { useSessionQueryKey } from '../../hooks/useSessionQueryKey';
 import PageHeader from '../../components/common/PageHeader';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import EmptyState from '../../components/common/EmptyState';
@@ -12,7 +13,7 @@ const HelsbContract: React.FC = () => {
   const [error, setError] = useState('');
 
   const { data: application, isLoading } = useQuery({
-    queryKey: ['my-application'],
+    queryKey: useSessionQueryKey('my-application'),
     queryFn: helsbService.getMyApplication,
     retry: false,
   });

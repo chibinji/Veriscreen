@@ -1,7 +1,6 @@
 package com.veriscreen.backend.service.document;
 
 import com.veriscreen.backend.dto.DocumentDto;
-<<<<<<< HEAD:veriscreen/backend/src/main/java/com/veriscreen/backend/service/document/DocumentServiceImpl.java
 import com.veriscreen.backend.dto.DocumentVerificationResponse;
 import com.veriscreen.backend.dto.GeneratedDocumentResponse;
 import com.veriscreen.backend.entity.AcademicResult;
@@ -23,13 +22,12 @@ import java.time.Year;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
-=======
-import com.veriscreen.backend.service.security.StudentAccessValidator;
->>>>>>> 8b452b7f50d2ea25c209b6f89403623c1d980c82:backend/src/main/java/com/veriscreen/backend/service/document/DocumentServiceImpl.java
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -37,7 +35,6 @@ public class DocumentServiceImpl implements DocumentService {
 
     private final List<DocumentGenerator> documentGenerators;
     private final StudentAccessValidator accessValidator;
-<<<<<<< HEAD:veriscreen/backend/src/main/java/com/veriscreen/backend/service/document/DocumentServiceImpl.java
     private final StudentRepository studentRepository;
     private final AcademicRecordGateway academicRecordGateway;
     private final IssuedDocumentRepository issuedDocumentRepository;
@@ -68,12 +65,6 @@ public class DocumentServiceImpl implements DocumentService {
         this.documentStorageService = documentStorageService;
         this.documentHashService = documentHashService;
         this.publicBaseUrl = trimTrailingSlash(publicBaseUrl);
-=======
-
-    public DocumentServiceImpl(List<DocumentGenerator> documentGenerators, StudentAccessValidator accessValidator) {
-        this.documentGenerators = documentGenerators;
-        this.accessValidator = accessValidator;
->>>>>>> 8b452b7f50d2ea25c209b6f89403623c1d980c82:backend/src/main/java/com/veriscreen/backend/service/document/DocumentServiceImpl.java
     }
 
     @Override
@@ -114,7 +105,6 @@ public class DocumentServiceImpl implements DocumentService {
                 .map(generator -> generator.generate(requestedStudentId))
                 .toList();
     }
-<<<<<<< HEAD:veriscreen/backend/src/main/java/com/veriscreen/backend/service/document/DocumentServiceImpl.java
 
     @Override
     @Transactional
@@ -271,6 +261,4 @@ public class DocumentServiceImpl implements DocumentService {
         }
         return value.endsWith("/") ? value.substring(0, value.length() - 1) : value;
     }
-=======
->>>>>>> 8b452b7f50d2ea25c209b6f89403623c1d980c82:backend/src/main/java/com/veriscreen/backend/service/document/DocumentServiceImpl.java
 }

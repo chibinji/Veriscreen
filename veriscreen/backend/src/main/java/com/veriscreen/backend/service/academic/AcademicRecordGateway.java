@@ -76,6 +76,10 @@ public class AcademicRecordGateway {
     }
 
     public void overlayStudent(Student student, SisModels.Student remote) {
+        if (remote.getId() != null && student.getId() != null && !remote.getId().equals(student.getId())) {
+            log.warn("Skipping SIS overlay: remote id {} does not match {}", remote.getId(), student.getId());
+            return;
+        }
         if (remote.getName() != null && !remote.getName().isBlank()) {
             student.setName(remote.getName());
         }

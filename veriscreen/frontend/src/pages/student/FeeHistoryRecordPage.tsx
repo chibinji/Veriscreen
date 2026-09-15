@@ -4,14 +4,15 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { usersApi } from '../../api';
 import { studentService } from '../../services/studentService';
 import { documentService } from '../../services/documentService';
+import { useSessionQueryKey } from '../../hooks/useSessionQueryKey';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import AlertMessage from '../../components/common/AlertMessage';
 import { getErrorMessage } from '../../utils';
 import { fullName, groupFees, money } from './recordsFormat';
 
 const FeeHistoryRecordPage: React.FC = () => {
-  const profileQuery = useQuery({ queryKey: ['student-profile'], queryFn: studentService.getProfile });
-  const feesQuery = useQuery({ queryKey: ['fee-records'], queryFn: () => usersApi.getFeeRecords() });
+  const profileQuery = useQuery({ queryKey: useSessionQueryKey('student-profile'), queryFn: studentService.getProfile });
+  const feesQuery = useQuery({ queryKey: useSessionQueryKey('fee-records'), queryFn: () => usersApi.getFeeRecords() });
 
   const historyMutation = useMutation({
     mutationFn: () => documentService.generateAndDownload('PAYMENT_HISTORY'),

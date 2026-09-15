@@ -2,12 +2,10 @@ package com.veriscreen.backend.controller;
 
 import com.veriscreen.backend.constants.ApiPaths;
 import com.veriscreen.backend.dto.DocumentDto;
-<<<<<<< HEAD:veriscreen/backend/src/main/java/com/veriscreen/backend/controller/StudentController.java
 import com.veriscreen.backend.dto.GeneratedDocumentResponse;
 import com.veriscreen.backend.dto.NotificationDto;
-=======
->>>>>>> 8b452b7f50d2ea25c209b6f89403623c1d980c82:backend/src/main/java/com/veriscreen/backend/controller/StudentController.java
 import com.veriscreen.backend.dto.StudentProfileDto;
+import com.veriscreen.backend.entity.OfficialDocumentType;
 import com.veriscreen.backend.service.document.DocumentService;
 import com.veriscreen.backend.service.notify.NotificationService;
 import com.veriscreen.backend.service.student.StudentService;
@@ -15,11 +13,15 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -71,7 +73,6 @@ public class StudentController {
         return ResponseEntity.ok(
                 documentService.listDocumentsForStudent(principal.getUsername(), studentId));
     }
-<<<<<<< HEAD:veriscreen/backend/src/main/java/com/veriscreen/backend/controller/StudentController.java
 
     @PostMapping("/me/documents/generate/{type}")
     @Operation(summary = "Generate an official PDF for the authenticated student")
@@ -111,6 +112,4 @@ public class StudentController {
         notificationService.markRead(principal.getUsername(), id);
         return ResponseEntity.ok().build();
     }
-=======
->>>>>>> 8b452b7f50d2ea25c209b6f89403623c1d980c82:backend/src/main/java/com/veriscreen/backend/controller/StudentController.java
 }
