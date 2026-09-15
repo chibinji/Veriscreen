@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { APP_NAME } from '../constants';
 import { colors } from '../theme';
 
@@ -9,11 +9,9 @@ export function BrandLogo({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) {
 
   return (
     <View style={styles.row}>
-      <Image
-        source={require('../../assets/veriscreen-logo.jpg')}
-        style={{ width: box, height: box }}
-        resizeMode="contain"
-      />
+      <View style={[styles.mark, { width: box, height: box, borderRadius: box * 0.22 }]}>
+        <Text style={[styles.check, { fontSize: box * 0.42 }]}>✓</Text>
+      </View>
       <Text style={[styles.word, { fontSize }]}>{APP_NAME}</Text>
     </View>
   );
@@ -21,5 +19,11 @@ export function BrandLogo({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) {
 
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  mark: {
+    backgroundColor: colors.indigo,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  check: { color: colors.gold, fontWeight: '800' },
   word: { color: colors.indigo, fontWeight: '800', letterSpacing: -0.4 },
 });

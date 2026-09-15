@@ -39,8 +39,12 @@ public class SecurityConfig {
                                 ApiPaths.API_V1,
                                 ApiPaths.AUTH + "/login",
                                 ApiPaths.LEGACY_AUTH + "/login",
+<<<<<<< HEAD:veriscreen/backend/src/main/java/com/veriscreen/backend/config/SecurityConfig.java
                                 ApiPaths.VERIFY + "/**",
                                 ApiPaths.INTERNAL_HELSB + "/**",
+=======
+                                ApiPaths.ADMIN_SYNC + "/**",
+>>>>>>> 8b452b7f50d2ea25c209b6f89403623c1d980c82:backend/src/main/java/com/veriscreen/backend/config/SecurityConfig.java
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**")
@@ -65,8 +69,7 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userDetailsService);
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
         provider.setPasswordEncoder(passwordEncoder());
         return provider;
     }

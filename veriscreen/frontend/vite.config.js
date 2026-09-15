@@ -9,13 +9,7 @@ export default defineConfig({
     },
     server: {
         port: 5173,
-        host: 'localhost',
-        proxy: {
-            '/api': {
-                target: 'http://localhost:8081',
-                changeOrigin: true,
-            },
-        },
+        host: '127.0.0.1',
     },
     optimizeDeps: {
         // Avoid a Windows hang where the first crawl never finishes.

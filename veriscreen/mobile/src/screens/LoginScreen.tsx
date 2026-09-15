@@ -11,8 +11,9 @@ import {
 } from 'react-native';
 import { BrandLogo } from '../components/BrandLogo';
 import { ErrorBanner } from '../components/Feedback';
+import { DEMO_ACCOUNTS } from '../constants';
 import { useAuth } from '../auth/AuthContext';
-import { colors, radii, spacing } from '../theme';
+import { colors, spacing } from '../theme';
 
 export default function LoginScreen() {
   const { login } = useAuth();
@@ -53,7 +54,7 @@ export default function LoginScreen() {
             autoCapitalize="none"
             autoCorrect={false}
             keyboardType="number-pad"
-            placeholder="Student number"
+            placeholder="2021465934"
             placeholderTextColor={colors.muted}
             style={styles.input}
           />
@@ -70,6 +71,28 @@ export default function LoginScreen() {
             <Text style={styles.buttonText}>{loading ? 'Signing in…' : 'Sign in'}</Text>
           </Pressable>
         </View>
+
+        <View style={styles.card}>
+          <Text style={styles.demoTitle}>Seeded student accounts</Text>
+          <Text style={styles.demoHint}>Tap a row to fill the form. Password is password123.</Text>
+          {DEMO_ACCOUNTS.map((account) => (
+            <Pressable
+              key={account.id}
+              style={styles.demoRow}
+              onPress={() => {
+                setStudentId(account.id);
+                setPassword(account.password);
+                setError('');
+              }}
+            >
+              <View>
+                <Text style={styles.demoId}>{account.id}</Text>
+                <Text style={styles.demoLabel}>{account.label}</Text>
+              </View>
+              <Text style={styles.use}>Use</Text>
+            </Pressable>
+          ))}
+        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -82,7 +105,7 @@ const styles = StyleSheet.create({
   sub: { color: colors.muted, marginBottom: spacing.lg },
   card: {
     backgroundColor: colors.white,
-    borderRadius: radii.card,
+    borderRadius: 16,
     padding: spacing.md,
     marginBottom: spacing.md,
     borderWidth: 1,
@@ -92,14 +115,15 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: radii.control,
-    paddingHorizontal: 20,
-    paddingVertical: 14,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
     color: colors.ink,
     backgroundColor: '#fbfcfe',
   },
   button: {
     marginTop: spacing.md,
+<<<<<<< HEAD:veriscreen/mobile/src/screens/LoginScreen.tsx
     backgroundColor: 'rgba(255,255,255,0.28)',
     borderWidth: 1.5,
     borderColor: 'rgba(27,122,74,0.4)',
@@ -109,4 +133,26 @@ const styles = StyleSheet.create({
   },
   buttonDisabled: { opacity: 0.7 },
   buttonText: { color: colors.navy, fontWeight: '700', fontSize: 16 },
+=======
+    backgroundColor: colors.indigo,
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  buttonDisabled: { opacity: 0.7 },
+  buttonText: { color: colors.white, fontWeight: '700', fontSize: 16 },
+  demoTitle: { fontWeight: '800', color: colors.navy, marginBottom: 4 },
+  demoHint: { color: colors.muted, fontSize: 12, marginBottom: 10 },
+  demoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 10,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+  },
+  demoId: { fontWeight: '700', color: colors.indigo },
+  demoLabel: { color: colors.muted, fontSize: 12, marginTop: 2, maxWidth: 220 },
+  use: { color: colors.lapis, fontWeight: '700' },
+>>>>>>> 8b452b7f50d2ea25c209b6f89403623c1d980c82:mobile/src/screens/LoginScreen.tsx
 });

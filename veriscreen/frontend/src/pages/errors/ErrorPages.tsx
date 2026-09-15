@@ -26,7 +26,7 @@ const ErrorPage: React.FC<ErrorPageProps> = ({ code, title, description, icon, s
   };
 
   return (
-    <div className="min-vh-100 vs-canvas d-flex flex-column align-items-center justify-content-center p-4">
+    <div className="min-vh-100 bg-light d-flex flex-column align-items-center justify-content-center p-4">
       <div className="text-center" style={{ maxWidth: 480 }}>
         <div className="mb-4 d-flex justify-content-center">
           <BrandLogo size="md" />

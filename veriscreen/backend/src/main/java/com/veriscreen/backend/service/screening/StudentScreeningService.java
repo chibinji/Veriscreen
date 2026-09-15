@@ -31,10 +31,13 @@ public interface StudentScreeningService {
 
     List<HelsbApplicationDto> listHelsbApplicationsForStudent(
             String authenticatedStudentId, String requestedStudentId);
+<<<<<<< HEAD:veriscreen/backend/src/main/java/com/veriscreen/backend/service/screening/StudentScreeningService.java
 
     HelsbApplicationDto submitHelsbApplication(String authenticatedStudentId, HelsbSubmitRequest request);
 
     byte[] downloadContract(String authenticatedStudentId, Long applicationId);
 
     HelsbApplicationDto emailContract(String authenticatedStudentId, Long applicationId);
+=======
+>>>>>>> 8b452b7f50d2ea25c209b6f89403623c1d980c82:backend/src/main/java/com/veriscreen/backend/service/screening/StudentScreeningService.java
 }

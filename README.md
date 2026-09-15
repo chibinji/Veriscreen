@@ -12,17 +12,25 @@ Student web app + Spring Boot backend for verified academic document access and 
 | [docs/VeriScreen-Backend-Guide.tex](docs/VeriScreen-Backend-Guide.tex) | Full architecture guide (compile to PDF with `pdflatex`) |
 | [docs/CODE_REVIEW_CHECKLIST.md](docs/CODE_REVIEW_CHECKLIST.md) | Pre-commit SOLID / security checklist |
 | [docs/database-least-privilege.sql](docs/database-least-privilege.sql) | PostgreSQL least-privilege user setup |
+| [docs/university-sis-integration.md](docs/university-sis-integration.md) | Simulated university SIS sync with VeriScreen |
 | [docs/veriscreen_project_proposal.pdf](docs/veriscreen_project_proposal.pdf) | Final year project proposal |
 
 ## Project structure
 
 | Folder | Description |
 |--------|-------------|
+<<<<<<< HEAD
 | `backend/` | VeriScreen Spring Boot API (JWT, PostgreSQL, PDFs, QR) |
 | `frontend/` | VeriScreen React student web portal |
 | `mobile/` | Expo student mobile app |
 | `simulated-student-system/` | Authoritative student records + registrar UI |
 | `helsb-portal/` | HELSB officer API and portal |
+=======
+| `backend/` | Spring Boot REST API (JWT, PostgreSQL, OpenAPI, university sync) |
+| `university-sim/` | Simulated university SIS (source of truth for academic data) |
+| `frontend/` | React + TypeScript student web portal |
+| `mobile/` | Expo (React Native) student mobile app |
+>>>>>>> 8b452b7f50d2ea25c209b6f89403623c1d980c82
 | `docs/` | Architecture guides and project documents |
 
 ## Quick start
@@ -44,19 +52,35 @@ Then start in this order:
 
 ### 1. Backend
 
+**Recommended (university SIS connected):**
+
 1. Create PostgreSQL database:
    ```sql
    CREATE DATABASE veriscreen_db;
    ```
 2. Update `backend/src/main/resources/application.properties` with your PostgreSQL password.
-3. Run:
+3. Start the simulated university SIS first (needs `university_db` — see [university-sim/README.md](university-sim/README.md)):
+   ```bash
+   cd university-sim
+   mvnw.cmd spring-boot:run
+   ```
+   SIS: `http://localhost:8090` — permanent PostgreSQL by default
+4. Then start VeriScreen (sync pulls students on startup):
    ```bash
    cd backend
    mvnw.cmd spring-boot:run
    ```
 
+<<<<<<< HEAD
 API: `http://localhost:8081`  
 Swagger: `http://localhost:8081/swagger-ui.html`
+=======
+To run VeriScreen **without** the SIS, set `university.sync.enabled=false` in `application.properties`.
+
+API: `http://localhost:8080`  
+Swagger: `http://localhost:8080/swagger-ui.html`  
+Manual sync: `POST http://localhost:8080/api/v1/admin/sync/university` with header `X-Api-Key: dev-shared-secret`
+>>>>>>> 8b452b7f50d2ea25c209b6f89403623c1d980c82
 
 ### 2. Frontend
 
@@ -90,7 +114,7 @@ In dev, the frontend **proxies** `/api` requests to the backend, so you don't ne
    ```
 3. Scan the QR code with Expo Go, or press `a` for an Android emulator.
 
-A phone cannot use `localhost`. The app uses your PC's LAN IP on port **8081** by default. Details: [mobile/README.md](mobile/README.md).
+A phone cannot use `localhost`. The app uses your PC's LAN IP on port 8080 by default. Details: [mobile/README.md](mobile/README.md).
 
 ### 4. HELSB officer portal
 

@@ -5,10 +5,14 @@ import type {
 } from '../types';
 
 export const helsbService = {
+<<<<<<< HEAD:veriscreen/frontend/src/services/helsbService.ts
   submitApplication: (
     documentIds: Array<number | string> = [],
     mobileMoney?: { phone: string; provider: string },
   ) => helsbApi.submitApplication(documentIds, mobileMoney),
+=======
+  submitApplication: (documentIds: number[]) => helsbApi.submitApplication(documentIds),
+>>>>>>> 8b452b7f50d2ea25c209b6f89403623c1d980c82:frontend/src/services/helsbService.ts
   getMyApplication: () => helsbApi.getMyApplication(),
   confirmApplication: (applicationId: number) => helsbApi.confirmApplication(applicationId),
   submitBankDetails: (data: Omit<BankDetails, 'id'>) => helsbApi.submitBankDetails(data),

@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 public interface RegistrationRepository extends JpaRepository<Registration, Long> {
 
     List<Registration> findByStudent_Id(String studentId);
+
+    void deleteByStudent_Id(String studentId);
 }

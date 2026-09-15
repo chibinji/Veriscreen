@@ -160,11 +160,9 @@ export function toStudentProfile(dto: BackendStudentProfile): StudentProfile {
 export function toDocumentType(type: string | undefined | null): DocumentType {
   const normalized = (type || '').toUpperCase().replace(/\s+/g, '_');
   if (normalized.includes('CONFIRMATION')) return 'CONFIRMATION_SLIP';
-  if (normalized.includes('EXAM')) return 'EXAMINATION_SLIP';
-  if (normalized.includes('PAYMENT')) return 'PAYMENT_HISTORY';
+  if (normalized.includes('EXAM')) return 'EXAM_SLIP';
   if (normalized.includes('FEE')) return 'FEE_STATEMENT';
   if (normalized.includes('CONTRACT')) return 'CONTRACT';
-  if (normalized.includes('RESULT')) return 'RESULTS';
   return 'TRANSCRIPT';
 }
 

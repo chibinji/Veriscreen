@@ -37,6 +37,7 @@ function attachDocuments(application: Application): Application {
 }
 
 export const helsbApi = {
+<<<<<<< HEAD:veriscreen/frontend/src/api/helsbApi.ts
   async submitApplication(
     documentIds: Array<number | string> = [],
     mobileMoney?: { phone: string; provider: string },
@@ -54,6 +55,10 @@ export const helsbApi = {
     const studentNumber = session?.studentNumber || session?.username || '';
     const studentName = session ? `${session.firstName} ${session.lastName}`.trim() : '';
     return toApplication(data, studentNumber, studentName);
+=======
+  async submitApplication(_documentIds: number[]): Promise<Application> {
+    fail(404, 'Submitting a HELSB application is not available. The server does not provide a submit endpoint.');
+>>>>>>> 8b452b7f50d2ea25c209b6f89403623c1d980c82:frontend/src/api/helsbApi.ts
   },
 
   async getMyApplication(): Promise<Application | null> {
@@ -62,6 +67,7 @@ export const helsbApi = {
     const studentName = session ? `${session.firstName} ${session.lastName}`.trim() : '';
     const { data } = await apiClient.get<BackendHelsbApplication[]>(API_ENDPOINTS.ME_HELSB);
     if (!data.length) return null;
+<<<<<<< HEAD:veriscreen/frontend/src/api/helsbApi.ts
     const ranked = [...data].sort((a, b) => {
       const score = (status?: string | null) => {
         const value = (status || '').toUpperCase();
@@ -74,6 +80,9 @@ export const helsbApi = {
     });
     const latest = ranked[0];
     return toApplication(latest, studentNumber, studentName);
+=======
+    return toApplication(data[0], studentNumber, studentName);
+>>>>>>> 8b452b7f50d2ea25c209b6f89403623c1d980c82:frontend/src/api/helsbApi.ts
   },
 
   async confirmApplication(applicationId: number): Promise<Application> {

@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 public interface FeeRepository extends JpaRepository<Fee, Long> {
 
     List<Fee> findByStudent_Id(String studentId);
+
+    void deleteByStudent_Id(String studentId);
 }

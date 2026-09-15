@@ -24,7 +24,7 @@ const VerificationPage: React.FC = () => {
   });
 
   return (
-    <div className="min-vh-100 vs-canvas d-flex flex-column">
+    <div className="min-vh-100 bg-light d-flex flex-column">
       <nav className="navbar bg-white border-bottom px-4">
         <a href="/" className="navbar-brand d-flex align-items-center mb-0">
           <BrandLogo size="sm" />
@@ -63,10 +63,11 @@ const VerificationPage: React.FC = () => {
                   </div>
                   <div className="row g-3">
                     {[
-                      { label: 'Document ID', value: data.documentId || verificationCode, icon: 'bi-qr-code' },
                       { label: 'Document Type', value: getDocumentLabel(data.documentType), icon: 'bi-file-earmark-text' },
-                      { label: 'Status', value: data.status, icon: 'bi-shield-check' },
-                      { label: 'Issued By', value: data.issuedBy || 'VeriScreen', icon: 'bi-building' },
+                      { label: 'Student Number', value: data.studentNumber, icon: 'bi-123' },
+                      { label: 'Student Name', value: data.studentName, icon: 'bi-person' },
+                      { label: 'Issued By', value: data.issuedBy, icon: 'bi-building' },
+                      { label: 'Verified Date', value: formatDateTime(data.generatedAt), icon: 'bi-calendar' },
                       { label: 'Verified At', value: formatDateTime(data.verifiedAt), icon: 'bi-clock' },
                     ].map((item) => (
                       <div key={item.label} className="col-sm-6">

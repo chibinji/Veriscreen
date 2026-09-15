@@ -6,6 +6,7 @@ import com.veriscreen.backend.entity.Fee;
 import com.veriscreen.backend.entity.HelsbApplication;
 import com.veriscreen.backend.entity.Registration;
 import com.veriscreen.backend.entity.Student;
+import com.veriscreen.backend.integration.university.UniversityProperties;
 import com.veriscreen.backend.repository.AcademicResultRepository;
 import com.veriscreen.backend.repository.ExaminationRepository;
 import com.veriscreen.backend.repository.FeeRepository;
@@ -16,12 +17,18 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Seeds demo academic + HELSB data when university sync is disabled.
+ * When sync is enabled, academic rows come from university-sim; HELSB is seeded by {@link HelsbBootstrap}.
+ */
 @Slf4j
 @Component
+@Order(2)
 public class DataLoader implements CommandLineRunner {
 
     /** Shared password for all mock students (dev/demo only). */
@@ -34,6 +41,7 @@ public class DataLoader implements CommandLineRunner {
     private final AcademicResultRepository academicResultRepository;
     private final HelsbApplicationRepository helsbApplicationRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UniversityProperties universityProperties;
 
     public DataLoader(
             StudentRepository studentRepository,
@@ -42,7 +50,8 @@ public class DataLoader implements CommandLineRunner {
             ExaminationRepository examinationRepository,
             AcademicResultRepository academicResultRepository,
             HelsbApplicationRepository helsbApplicationRepository,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            UniversityProperties universityProperties) {
         this.studentRepository = studentRepository;
         this.registrationRepository = registrationRepository;
         this.feeRepository = feeRepository;
@@ -50,17 +59,27 @@ public class DataLoader implements CommandLineRunner {
         this.academicResultRepository = academicResultRepository;
         this.helsbApplicationRepository = helsbApplicationRepository;
         this.passwordEncoder = passwordEncoder;
+        this.universityProperties = universityProperties;
     }
 
     @Override
     @Transactional
     public void run(String... args) {
+<<<<<<< HEAD:veriscreen/backend/src/main/java/com/veriscreen/backend/service/DataLoader.java
         if (studentRepository.count() == 0) {
             seedSamuelMwanza();
             seedNosikuMukuka();
             seedGraceBanda();
             seedPeterZulu();
             log.info("Seeded {} mock students with varied screening scenarios", studentRepository.count());
+=======
+        if (universityProperties.getSync().isEnabled()) {
+            log.info("Skipping local academic DataLoader seed (university.sync.enabled=true)");
+            return;
+        }
+        if (studentRepository.count() > 0) {
+            return;
+>>>>>>> 8b452b7f50d2ea25c209b6f89403623c1d980c82:backend/src/main/java/com/veriscreen/backend/service/DataLoader.java
         }
         backfillStudentContactsAndLoans();
     }

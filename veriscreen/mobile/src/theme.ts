@@ -22,11 +22,6 @@ export const spacing = {
   xl: 32,
 };
 
-export const radii = {
-  card: 20,
-  control: 999,
-};
-
 export function statusColor(status: string): string {
   const map: Record<string, string> = {
     ACTIVE: colors.success,

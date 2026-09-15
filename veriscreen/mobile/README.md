@@ -30,15 +30,15 @@ npx expo start
 
 ## Connecting to the backend
 
-The app talks to port **8081**. A phone cannot use `localhost` — that would mean the phone itself.
+The app talks to port **8080**. A phone cannot use `localhost` — that would mean the phone itself.
 
-By default the app uses the same IP address Expo shows for Metro, plus port 8081. That usually works on a physical device.
+By default the app uses the same IP address Expo shows for Metro, plus port 8080. That usually works on a physical device.
 
 | Where the app runs | API URL |
 |---|---|
-| Android emulator | `http://10.0.2.2:8081` |
-| iOS simulator | `http://localhost:8081` |
-| Physical phone | `http://YOUR_PC_LAN_IP:8081` |
+| Android emulator | `http://10.0.2.2:8080` |
+| iOS simulator | `http://localhost:8080` |
+| Physical phone | `http://YOUR_PC_LAN_IP:8080` |
 
 To force a URL, copy `.env.example` to `.env` and set `EXPO_PUBLIC_API_URL`.
 
