@@ -121,7 +121,7 @@ const StudentApplications: React.FC = () => {
     <div>
       <PageHeader
         title="HELSB"
-        subtitle="Higher Education Loans and Scholarship Board ? loan status, screening and submission."
+        subtitle="Consent, submission, and application status for your HELSB loan."
         breadcrumbs={[{ label: 'Dashboard', path: '/student/dashboard' }, { label: 'HELSB' }]}
       />
 
@@ -133,6 +133,7 @@ const StudentApplications: React.FC = () => {
         <LoadingSpinner />
       ) : (
         <>
+          <h2 className="h5 mb-3">Application status</h2>
           <div className="row g-3 mb-4">
             <div className="col-md-4">
               <div className="card border-0 shadow-sm h-100">
@@ -176,7 +177,7 @@ const StudentApplications: React.FC = () => {
                     <StatusBadge status={application?.status || 'PENDING'} label={application ? getHelsbStatusLabel(application.status) : 'Not submitted'} />
                   )}
                   <p className="small text-muted mt-2 mb-0">
-                    Screening result: {application?.screeningResult || '?'}
+                    Screening result: {application?.screeningResult || 'Not available'}
                   </p>
                 </div>
               </div>
@@ -187,7 +188,7 @@ const StudentApplications: React.FC = () => {
                   <p className="text-muted small mb-1">HELSB loan number</p>
                   <div className="fw-bold">{application?.applicationNumber || '?'}</div>
                   <p className="small mb-0 mt-2">
-                    Submitted: {application?.submittedAt ? 'Yes' : 'No'} ? Approved: {approved ? 'Yes' : 'No'}
+                    Submitted: {application?.submittedAt ? 'Yes' : 'No'} · Approved: {approved ? 'Yes' : 'No'}
                   </p>
                 </div>
               </div>
@@ -211,7 +212,7 @@ const StudentApplications: React.FC = () => {
                 ].map(([label, value]) => (
                   <div className="col-sm-6 col-lg-4" key={label}>
                     <p className="text-muted small mb-1">{label}</p>
-                    <div className="fw-medium">{value || '?'}</div>
+                    <div className="fw-medium">{value || '—'}</div>
                   </div>
                 ))}
               </div>
@@ -228,12 +229,27 @@ const StudentApplications: React.FC = () => {
                   </div>
                 </div>
                 <button className="btn btn-primary" disabled={contractMutation.isPending} onClick={() => contractMutation.mutate()}>
-                  {contractMutation.isPending ? 'Preparing?' : 'Download contract'}
+                  {contractMutation.isPending ? 'Preparing…' : 'Download contract'}
                 </button>
               </div>
             </div>
           )}
         </>
+      )}
+
+      {(waiting || approved) && application && (
+        <div className="card border-0 shadow-sm mb-4">
+          <div className="card-header bg-white border-bottom fw-semibold py-3">Consent and submission</div>
+          <div className="card-body">
+            <p className="mb-2">
+              Submitted {application.submittedAt ? formatDateTime(application.submittedAt) : '—'} with consent to share verified documents with HELSB.
+            </p>
+            <p className="mb-0 small text-muted">
+              Application {application.applicationNumber || application.id} · {getHelsbStatusLabel(application.status)}
+              {application.submittedDocumentIds ? ` · ${application.submittedDocumentIds}` : ''}
+            </p>
+          </div>
+        </div>
       )}
 
       {!waiting && !approved && (
@@ -246,6 +262,7 @@ const StudentApplications: React.FC = () => {
               <LoadingSpinner />
             ) : (
               <>
+                <h3 className="h6 mb-2">Submission</h3>
                 <div className="row g-2 mb-3">
                   {documentOptions.map((doc) => (
                     <div key={doc.type} className="col-sm-6 col-md-3">
@@ -274,6 +291,7 @@ const StudentApplications: React.FC = () => {
                   ))}
                 </div>
 
+                <h3 className="h6 mb-2">Consent</h3>
                 <div className="form-check mb-3">
                   <input
                     id="helsb-consent"

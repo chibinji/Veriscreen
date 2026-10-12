@@ -38,7 +38,7 @@ const DocumentsPage: React.FC = () => {
     <div>
       <PageHeader
         title="My Documents"
-        subtitle="Preview and download official documents."
+        subtitle="Verified academic PDFs, each sealed with a QR verification code."
         breadcrumbs={[{ label: 'Dashboard', path: '/student/dashboard' }, { label: 'Documents' }]}
       />
 
@@ -47,7 +47,7 @@ const DocumentsPage: React.FC = () => {
 
       <div className="card border-0 shadow-sm">
         <div className="card-header bg-white border-bottom fw-semibold py-3 text-navy">
-          <i className="bi bi-file-earmark-check me-2 text-gold" />Verified Documents
+          <i className="bi bi-file-earmark-check me-2 text-gold" />Verified, QR-sealed PDFs
         </div>
         <div className="card-body p-0">
           {isLoading ? (
@@ -64,7 +64,7 @@ const DocumentsPage: React.FC = () => {
                 <thead className="table-light">
                   <tr>
                     <th>Document Type</th>
-                    <th>Verification Code</th>
+                    <th>QR code</th>
                     <th>Verified</th>
                     <th>Expires</th>
                     <th>Status</th>

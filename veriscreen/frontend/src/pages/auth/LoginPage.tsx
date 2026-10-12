@@ -8,8 +8,7 @@ import { authService } from '../../services/authService';
 import { useAuthStore } from '../../store/authStore';
 import { getErrorMessage, getRoleDashboard, getRoleBasePath } from '../../utils';
 import AlertMessage from '../../components/common/AlertMessage';
-import BrandLogo from '../../components/brand/BrandLogo';
-import veriscreenMark from '../../assets/veriscreen-mark.jpg';
+import shieldMark from '../../assets/veriscreen-shield.jpg';
 import { APP_NAME } from '../../constants';
 import type { Role } from '../../types';
 
@@ -67,83 +66,98 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="login-split">
-      <section className="login-split__form">
-        <div className="login-split__form-inner">
-          <BrandLogo size="sm" className="mb-4 login-split__logo" />
-          <h1 className="login-split__title">Sign in</h1>
-          <p className="login-split__subtitle">Secure academic document verification</p>
-
-          {registeredMessage && <AlertMessage type="success" message={registeredMessage} />}
-          {error && <AlertMessage type="danger" message={error} onDismiss={() => setError('')} />}
-
-          <form onSubmit={handleSubmit(onSubmit)} noValidate>
-            <div className="mb-3">
-              <label className="form-label">Username or Student Number</label>
-              <input
-                {...register('username')}
-                type="text"
-                className={`form-control ${errors.username ? 'is-invalid' : ''}`}
-                placeholder="Enter username"
-                autoComplete="username"
-                autoFocus
-              />
-              {errors.username && <div className="invalid-feedback d-block">{errors.username.message}</div>}
+    <div className="login-stage">
+      <div className="login-card">
+        <section className="login-art">
+          <div className="login-art__brand">
+            <img src={shieldMark} alt="" />
+            <div>
+              <strong>{APP_NAME}</strong>
+              <span>Verified records</span>
             </div>
-
-            <div className="mb-4">
-              <div className="d-flex justify-content-between align-items-center mb-1">
-                <label className="form-label mb-0">Password</label>
-                <Link to="/forgot-password" className="login-split__link">Forgot password?</Link>
-              </div>
-              <div className="login-split__password">
-                <input
-                  {...register('password')}
-                  type={showPassword ? 'text' : 'password'}
-                  className={`form-control ${errors.password ? 'is-invalid' : ''}`}
-                  placeholder="Enter password"
-                  autoComplete="current-password"
-                />
-                <button
-                  type="button"
-                  className="login-split__eye"
-                  onClick={() => setShowPassword(!showPassword)}
-                  tabIndex={-1}
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
-                >
-                  <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`} />
-                </button>
-              </div>
-              {errors.password && <div className="invalid-feedback d-block">{errors.password.message}</div>}
-            </div>
-
-            <button type="submit" className="btn btn-bubble w-100" disabled={loading}>
-              {loading ? (
-                <><span className="spinner-border spinner-border-sm me-2" />Signing in…</>
-              ) : (
-                'Sign in'
-              )}
-            </button>
-          </form>
-
-          <p className="login-split__footer">
-            Don&apos;t have an account?{' '}
-            <Link to="/register">Create now</Link>
-          </p>
-        </div>
-      </section>
-
-      <aside className="login-split__brand" aria-hidden="true">
-        <div className="login-split__brand-inner">
-          <div className="login-split__mark-card">
-            <img src={veriscreenMark} alt="" />
           </div>
-          <h2>Secure. Simple. Verified.</h2>
-          <p>
-            {APP_NAME} helps students access verified academic documents and apply to HELSB with ease.
+
+          <div className="login-art__scene" aria-hidden="true">
+            <span className="login-art__blob login-art__blob--a" />
+            <span className="login-art__blob login-art__blob--b" />
+            <span className="login-art__blob login-art__blob--c" />
+            <span className="login-art__dot login-art__dot--1" />
+            <span className="login-art__dot login-art__dot--2" />
+            <span className="login-art__dot login-art__dot--3" />
+            <img src={shieldMark} alt="" />
+          </div>
+
+          <p className="login-art__legal">© {new Date().getFullYear()} {APP_NAME}</p>
+        </section>
+
+        <section className="login-panel">
+          <div className="login-panel__body">
+            <h1>Sign in</h1>
+
+            {registeredMessage && <AlertMessage type="success" message={registeredMessage} />}
+            {error && <AlertMessage type="danger" message={error} onDismiss={() => setError('')} />}
+
+            <form onSubmit={handleSubmit(onSubmit)} noValidate>
+              <div className="login-field">
+                <label className="login-field__label" htmlFor="login-username">Username</label>
+                <input
+                  id="login-username"
+                  {...register('username')}
+                  type="text"
+                  className={`form-control ${errors.username ? 'is-invalid' : ''}`}
+                  placeholder="Enter your username"
+                  autoComplete="username"
+                  autoFocus
+                />
+                {errors.username && <div className="invalid-feedback d-block">{errors.username.message}</div>}
+              </div>
+
+              <div className="login-field">
+                <label className="login-field__label" htmlFor="login-password">Password</label>
+                <div className="login-panel__password">
+                  <input
+                    id="login-password"
+                    {...register('password')}
+                    type={showPassword ? 'text' : 'password'}
+                    className={`form-control ${errors.password ? 'is-invalid' : ''}`}
+                    placeholder="Enter your password"
+                    autoComplete="current-password"
+                  />
+                  <button
+                    type="button"
+                    className="login-panel__eye"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`} />
+                  </button>
+                </div>
+                {errors.password && <div className="invalid-feedback d-block">{errors.password.message}</div>}
+                <div className="login-panel__forgot">
+                  <Link to="/forgot-password">Forgot password?</Link>
+                </div>
+              </div>
+
+              <button type="submit" className="login-panel__submit" disabled={loading}>
+                {loading ? (
+                  <><span className="spinner-border spinner-border-sm me-2" />Signing in…</>
+                ) : (
+                  'Sign in'
+                )}
+              </button>
+            </form>
+
+            <p className="login-panel__register">
+              Don&apos;t have an account?{' '}
+              <Link to="/register">Register now</Link>
+            </p>
+          </div>
+
+          <p className="login-panel__help">
+            Have a problem? Contact your university registrar.
           </p>
-        </div>
-      </aside>
+        </section>
+      </div>
     </div>
   );
 };
