@@ -297,10 +297,10 @@ app.use((error, _req, res, _next) => {
 
 initDatabase()
   .then(() => {
-    app.listen(PORT, () => console.log(`HELSB Node API listening on ${PORT}`));
+    app.listen(PORT, '0.0.0.0', () => console.log(`HELSB Node API listening on ${PORT}`));
   })
   .catch((error) => {
-    console.error('Could not start. Check MySQL settings in .env.');
+    console.error('Could not start. Check the database settings.');
     console.error(error.message);
     process.exit(1);
   });

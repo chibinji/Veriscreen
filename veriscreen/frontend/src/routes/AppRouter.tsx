@@ -1,15 +1,12 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 
-import PublicLayout from '../layouts/PublicLayout';
 import StudentLayout from '../layouts/StudentLayout';
 import HelsbStudentLayout from '../layouts/HelsbStudentLayout';
 import OfficerLayout from '../layouts/OfficerLayout';
 import AdminLayout from '../layouts/AdminLayout';
 
 import LoginPage from '../pages/auth/LoginPage';
-import RegisterPage from '../pages/auth/RegisterPage';
-import ForgotPasswordPage from '../pages/auth/ForgotPasswordPage';
 
 import StudentDashboard from '../pages/student/StudentDashboard';
 import StudentProfile from '../pages/student/StudentProfile';
@@ -54,10 +51,6 @@ const guard = (roles: Role[], Layout: React.ComponentType) => (
 const AppRouter: React.FC = () => (
   <Routes>
     <Route path="/login" element={<LoginPage />} />
-    <Route element={<PublicLayout />}>
-      <Route path="/register" element={<RegisterPage />} />
-      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-    </Route>
 
     {/* Standalone public */}
     <Route path="/verify/:verificationCode" element={<VerificationPage />} />

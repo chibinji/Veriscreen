@@ -12,7 +12,7 @@ import { buildPdf } from './pdf.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT || 8081);
 const JWT_SECRET = process.env.JWT_SECRET || 'change-this-before-deploy';
-const PUBLIC_URL = (process.env.PUBLIC_URL || `http://localhost:${PORT}`).replace(/\/$/, '');
+const PUBLIC_URL = (process.env.PUBLIC_URL || process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`).replace(/\/$/, '');
 const storageDir = path.join(__dirname, 'storage');
 
 const app = express();
@@ -487,12 +487,12 @@ app.use((error, _req, res, _next) => {
 
 initDatabase()
   .then(() => {
-    app.listen(PORT, () => {
+    app.listen(PORT, '0.0.0.0', () => {
       console.log(`VeriScreen Node API listening on ${PORT}`);
     });
   })
   .catch((error) => {
-    console.error('Could not start. Check MySQL settings in .env.');
+    console.error('Could not start. Check the database settings.');
     console.error(error.message);
     process.exit(1);
   });

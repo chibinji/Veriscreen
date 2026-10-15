@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, Navigate, useNavigate, useLocation } from 'react-router-dom';
+import { Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { flushSync } from 'react-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -35,8 +35,7 @@ const LoginPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const from = (location.state as { from?: { pathname: string }; message?: string })?.from?.pathname;
-  const registeredMessage = (location.state as { message?: string } | null)?.message;
+  const from = (location.state as { from?: { pathname: string } } | null)?.from?.pathname;
 
   const {
     register,
@@ -94,7 +93,6 @@ const LoginPage: React.FC = () => {
           <div className="login-panel__body">
             <h1>Sign in</h1>
 
-            {registeredMessage && <AlertMessage type="success" message={registeredMessage} />}
             {error && <AlertMessage type="danger" message={error} onDismiss={() => setError('')} />}
 
             <form onSubmit={handleSubmit(onSubmit)} noValidate>
@@ -133,9 +131,6 @@ const LoginPage: React.FC = () => {
                   </button>
                 </div>
                 {errors.password && <div className="invalid-feedback d-block">{errors.password.message}</div>}
-                <div className="login-panel__forgot">
-                  <Link to="/forgot-password">Forgot password?</Link>
-                </div>
               </div>
 
               <button type="submit" className="login-panel__submit" disabled={loading}>
@@ -146,11 +141,6 @@ const LoginPage: React.FC = () => {
                 )}
               </button>
             </form>
-
-            <p className="login-panel__register">
-              Don&apos;t have an account?{' '}
-              <Link to="/register">Register now</Link>
-            </p>
           </div>
 
           <p className="login-panel__help">

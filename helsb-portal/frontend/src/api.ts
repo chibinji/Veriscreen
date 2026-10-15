@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const TOKEN_KEY = 'helsb_officer_token';
-export const DOCUMENT_VERIFY_BASE = 'http://localhost:8081/api/verify';
+export const DOCUMENT_VERIFY_BASE = import.meta.env.VITE_VERIFY_BASE || 'http://localhost:8081/api/verify';
 
 export const api = axios.create({ baseURL: '' });
 

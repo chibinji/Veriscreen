@@ -1,0 +1,54 @@
+# Free Render addresses: https://chibinji-veriscreen.onrender.com and https://chibinji-helsb.onrender.com
+# The free Postgres database expires 30 days after it is created.
+databases:
+  - name: veriscreen-db
+    plan: free
+    region: oregon
+    databaseName: veriscreen
+
+services:
+  - type: web
+    name: chibinji-veriscreen
+    runtime: node
+    plan: free
+    region: oregon
+    branch: main
+    rootDir: veriscreen
+    buildCommand: npm install --include=dev --prefix frontend && npm run build:host --prefix frontend && npm install --prefix server
+    startCommand: node server/server.js
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: DB_SCHEMA
+        value: veriscreen
+      - key: DATABASE_URL
+        fromDatabase:
+          name: veriscreen-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+
+  - type: web
+    name: chibinji-helsb
+    runtime: node
+    plan: free
+    region: oregon
+    branch: main
+    rootDir: helsb-portal
+    buildCommand: npm install --include=dev --prefix frontend && npm run build:host --prefix frontend && npm install --prefix server
+    startCommand: node server/server.js
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: DB_SCHEMA
+        value: helsb
+      - key: DATABASE_URL
+        fromDatabase:
+          name: veriscreen-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: VITE_VERIFY_BASE
+        value: https://chibinji-veriscreen.onrender.com/api/verify
