@@ -6,6 +6,9 @@ backend/target/
 university-sim/target/
 frontend/node_modules/
 frontend/dist/
+veriscreen/server/node_modules/
+veriscreen/server/storage/
+helsb-portal/server/node_modules/
 mobile/node_modules/
 mobile/.expo/
 mobile/dist/

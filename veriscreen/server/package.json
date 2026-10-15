@@ -1,0 +1,20 @@
+{
+  "name": "veriscreen-server",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "VeriScreen student API and site, Node.js and MySQL",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.6.1",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.14.1",
+    "pdfkit": "^0.17.1",
+    "qrcode": "^1.5.4"
+  }
+}

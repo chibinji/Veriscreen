@@ -64,14 +64,41 @@ export const documentsApi = {
     return doc;
   },
 
-  async generateDocument(_type: DocumentType): Promise<Document> {
-    fail(404, 'Generating documents is not available. The server lists verified documents and does not provide a generate endpoint.');
+  async generateDocument(type: DocumentType): Promise<Document & { documentId: string }> {
+    requireSession();
+    const { data } = await apiClient.post<{ documentId: string; generatedAt?: string }>(
+      `/api/v1/students/me/documents/generate/${type}`,
+    );
+    const documents = await this.getDocuments();
+    const created = documents.find((item) => item.officialId === data.documentId);
+    return {
+      ...(created || {
+        id: 0,
+        type,
+        studentNumber: '',
+        studentName: '',
+        generatedAt: data.generatedAt || new Date().toISOString(),
+        verificationCode: data.documentId,
+        status: 'GENERATED',
+        officialId: data.documentId,
+      }),
+      documentId: data.documentId,
+    };
   },
 
   async downloadDocument(id: number, filename: string): Promise<void> {
     const documents = await this.getDocuments();
     const doc = documents.find((item) => item.id === id);
     if (!doc) fail(404, 'Document not found.');
+    if (doc.officialId) {
+      const { data } = await apiClient.get<Blob>(
+        `/api/v1/students/me/documents/${doc.officialId}/download`,
+        { responseType: 'blob' },
+      );
+      const name = filename.toLowerCase().endsWith('.pdf') ? filename : `${filename}.pdf`;
+      downloadBlob(data, name);
+      return;
+    }
     const extra = documentSummaries.get(id);
     if (extra?.url) {
       window.open(extra.url, '_blank', 'noopener');

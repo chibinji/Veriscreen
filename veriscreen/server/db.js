@@ -1,0 +1,274 @@
+import mysql from 'mysql2/promise';
+import bcrypt from 'bcryptjs';
+
+const config = {
+  host: process.env.DB_HOST || 'localhost',
+  port: Number(process.env.DB_PORT || 3306),
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || '',
+  database: process.env.DB_NAME || 'veriscreen_db',
+};
+
+export const pool = mysql.createPool({
+  ...config,
+  waitForConnections: true,
+  connectionLimit: 10,
+});
+
+const SCHEMA = `
+CREATE TABLE IF NOT EXISTS students (
+  id VARCHAR(32) PRIMARY KEY,
+  name VARCHAR(160) NOT NULL,
+  nrc VARCHAR(32),
+  program VARCHAR(160),
+  faculty VARCHAR(160),
+  enrollment_year INT,
+  password_hash VARCHAR(255) NOT NULL,
+  email VARCHAR(160),
+  phone VARCHAR(40),
+  registration_status VARCHAR(32) DEFAULT 'ACTIVE',
+  next_of_kin_name VARCHAR(160),
+  next_of_kin_relationship VARCHAR(80),
+  next_of_kin_phone VARCHAR(40),
+  next_of_kin_nrc VARCHAR(32),
+  next_of_kin_address VARCHAR(255)
+);
+
+CREATE TABLE IF NOT EXISTS registrations (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  student_id VARCHAR(32) NOT NULL,
+  academic_year VARCHAR(20),
+  semester INT,
+  confirmed TINYINT(1) DEFAULT 0,
+  registration_date DATE,
+  FOREIGN KEY (student_id) REFERENCES students(id)
+);
+
+CREATE TABLE IF NOT EXISTS fees (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  student_id VARCHAR(32) NOT NULL,
+  payment_date DATE,
+  amount DECIMAL(12,2) DEFAULT 0,
+  receipt_no VARCHAR(64),
+  outstanding_balance DECIMAL(12,2) DEFAULT 0,
+  description VARCHAR(160),
+  FOREIGN KEY (student_id) REFERENCES students(id)
+);
+
+CREATE TABLE IF NOT EXISTS examinations (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  student_id VARCHAR(32) NOT NULL,
+  academic_year VARCHAR(20),
+  eligible TINYINT(1) DEFAULT 0,
+  status VARCHAR(40),
+  FOREIGN KEY (student_id) REFERENCES students(id)
+);
+
+CREATE TABLE IF NOT EXISTS academic_results (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  student_id VARCHAR(32) NOT NULL,
+  course_code VARCHAR(32),
+  course_name VARCHAR(160),
+  grade VARCHAR(8),
+  credits INT DEFAULT 0,
+  academic_year VARCHAR(20),
+  FOREIGN KEY (student_id) REFERENCES students(id)
+);
+
+CREATE TABLE IF NOT EXISTS helsb_applications (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  student_id VARCHAR(32) NOT NULL,
+  application_status VARCHAR(40),
+  payment_status VARCHAR(40),
+  screening_result VARCHAR(40),
+  contract_details VARCHAR(255),
+  application_number VARCHAR(40),
+  notes VARCHAR(255),
+  submitted_at DATETIME NULL,
+  reviewed_at DATETIME NULL,
+  loan_percent INT,
+  mobile_money_phone VARCHAR(40),
+  mobile_money_provider VARCHAR(40),
+  submitted_document_ids VARCHAR(500),
+  FOREIGN KEY (student_id) REFERENCES students(id)
+);
+
+CREATE TABLE IF NOT EXISTS documents (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  student_id VARCHAR(32) NOT NULL,
+  document_id VARCHAR(64) NOT NULL UNIQUE,
+  type VARCHAR(40) NOT NULL,
+  summary VARCHAR(255),
+  generated_at DATETIME NOT NULL,
+  file_path VARCHAR(255),
+  FOREIGN KEY (student_id) REFERENCES students(id)
+);
+
+CREATE TABLE IF NOT EXISTS notifications (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  student_id VARCHAR(32) NOT NULL,
+  title VARCHAR(160),
+  message VARCHAR(500),
+  type VARCHAR(20) DEFAULT 'INFO',
+  channel VARCHAR(20) DEFAULT 'IN_APP',
+  is_read TINYINT(1) DEFAULT 0,
+  link VARCHAR(160),
+  created_at DATETIME NOT NULL,
+  FOREIGN KEY (student_id) REFERENCES students(id)
+);
+`;
+
+export async function initDatabase() {
+  const bootstrap = await mysql.createConnection({
+    host: config.host,
+    port: config.port,
+    user: config.user,
+    password: config.password,
+  });
+  await bootstrap.query(`CREATE DATABASE IF NOT EXISTS \`${config.database}\``);
+  await bootstrap.end();
+
+  const statements = SCHEMA.split(';').map((sql) => sql.trim()).filter(Boolean);
+  for (const statement of statements) {
+    await pool.query(statement);
+  }
+  await seedIfEmpty();
+}
+
+async function seedIfEmpty() {
+  const [rows] = await pool.query('SELECT COUNT(*) AS total FROM students');
+  if (rows[0].total > 0) return;
+  const passwordHash = bcrypt.hashSync('password123', 10);
+  const students = [
+    ['2021465934', 'Samuel Chibinji Mwanza', '123456/78/1', 'Computer Science', 'School of Natural and Applied Sciences', 2021, 'samuel.mwanza@unza.zm', '0971112233', 'Mary Mwanza', 'Mother', '0971112244', '111222/10/1', 'Kabulonga, Lusaka'],
+    ['2022030346', 'Nosiku Mukuka', '234567/89/2', 'Information Technology', 'School of Natural and Applied Sciences', 2022, 'nosiku.mukuka@unza.zm', '0972223344', 'Joseph Mukuka', 'Father', '0972223355', '222333/11/1', 'Kitwe, Copperbelt'],
+    ['2020123456', 'Grace Banda', '345678/90/3', 'Economics', 'School of Humanities', 2020, 'grace.banda@unza.zm', '0973334455', 'Agnes Banda', 'Mother', '0973334466', '333444/12/1', 'Chipata, Eastern'],
+    ['2019876543', 'Peter Zulu', '456789/01/4', 'Electrical Engineering', 'School of Engineering', 2019, 'peter.zulu@unza.zm', '0974445566', 'Daniel Zulu', 'Brother', '0974445577', '444555/13/1', 'Mansa, Luapula'],
+  ];
+  for (const student of students) {
+    await pool.query(
+      `INSERT INTO students
+        (id, name, nrc, program, faculty, enrollment_year, password_hash, email, phone,
+         next_of_kin_name, next_of_kin_relationship, next_of_kin_phone, next_of_kin_nrc, next_of_kin_address)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [...student.slice(0, 6), passwordHash, ...student.slice(6)],
+    );
+  }
+
+  const registrations = [
+    ['2021465934', '2023/2024', 1, 1, '2023-09-04'],
+    ['2021465934', '2023/2024', 2, 1, '2024-01-12'],
+    ['2021465934', '2024/2025', 1, 1, '2024-09-02'],
+    ['2021465934', '2024/2025', 2, 1, '2025-01-15'],
+    ['2022030346', '2023/2024', 1, 1, '2023-09-05'],
+    ['2022030346', '2023/2024', 2, 1, '2024-01-18'],
+    ['2022030346', '2024/2025', 1, 1, '2024-09-03'],
+    ['2020123456', '2023/2024', 1, 1, '2023-09-08'],
+    ['2020123456', '2023/2024', 2, 1, '2024-01-20'],
+    ['2020123456', '2024/2025', 1, 0, '2024-09-10'],
+    ['2019876543', '2022/2023', 1, 1, '2022-09-01'],
+    ['2019876543', '2022/2023', 2, 1, '2023-01-11'],
+    ['2019876543', '2023/2024', 1, 1, '2023-09-02'],
+    ['2019876543', '2023/2024', 2, 1, '2024-01-09'],
+    ['2019876543', '2024/2025', 1, 1, '2024-09-04'],
+  ];
+  for (const row of registrations) {
+    await pool.query(
+      'INSERT INTO registrations (student_id, academic_year, semester, confirmed, registration_date) VALUES (?, ?, ?, ?, ?)',
+      row,
+    );
+  }
+
+  const fees = [
+    ['2021465934', '2023-09-01', 4500, 'RCPT-2023-001', 0],
+    ['2021465934', '2024-09-01', 4500, 'RCPT-2024-001', 0],
+    ['2021465934', '2025-01-10', 4500, 'RCPT-2025-001', 500],
+    ['2022030346', '2023-09-02', 4200, 'RCPT-NM-2023-001', 0],
+    ['2022030346', '2024-01-14', 4200, 'RCPT-NM-2024-001', 0],
+    ['2022030346', '2024-09-02', 4200, 'RCPT-NM-2024-002', 0],
+    ['2020123456', '2023-09-03', 4000, 'RCPT-GB-2023-001', 0],
+    ['2020123456', '2024-01-16', 4000, 'RCPT-GB-2024-001', 2500],
+    ['2019876543', '2023-09-01', 5000, 'RCPT-PZ-2023-001', 1200],
+    ['2019876543', '2024-01-12', 5000, 'RCPT-PZ-2024-001', 800],
+    ['2019876543', '2024-09-03', 5000, 'RCPT-PZ-2024-002', 800],
+  ];
+  for (const row of fees) {
+    await pool.query(
+      'INSERT INTO fees (student_id, payment_date, amount, receipt_no, outstanding_balance, description) VALUES (?, ?, ?, ?, ?, ?)',
+      [...row, 'Tuition fee'],
+    );
+  }
+
+  const exams = [
+    ['2021465934', '2024/2025', 1, 'CLEARED'],
+    ['2021465934', '2023/2024', 1, 'COMPLETED'],
+    ['2022030346', '2024/2025', 1, 'CLEARED'],
+    ['2022030346', '2023/2024', 1, 'COMPLETED'],
+    ['2020123456', '2023/2024', 1, 'COMPLETED'],
+    ['2020123456', '2024/2025', 0, 'BLOCKED_FEES'],
+    ['2019876543', '2022/2023', 1, 'COMPLETED'],
+    ['2019876543', '2023/2024', 1, 'COMPLETED'],
+    ['2019876543', '2024/2025', 1, 'CLEARED'],
+  ];
+  for (const row of exams) {
+    await pool.query(
+      'INSERT INTO examinations (student_id, academic_year, eligible, status) VALUES (?, ?, ?, ?)',
+      row,
+    );
+  }
+
+  const results = [
+    ['2021465934', 'CSC4101', 'A', 3],
+    ['2021465934', 'CSC4102', 'B+', 3],
+    ['2021465934', 'CSC4901', 'A', 4],
+    ['2021465934', 'CSC4201', 'B', 2],
+    ['2022030346', 'ICT2201', 'B+', 3],
+    ['2022030346', 'ICT2202', 'A-', 3],
+    ['2022030346', 'STA2101', 'B', 4],
+    ['2022030346', 'COM1202', 'A', 2],
+    ['2020123456', 'ECO3101', 'C+', 3],
+    ['2020123456', 'ECO3102', 'C', 3],
+    ['2020123456', 'ECO2103', 'B-', 4],
+    ['2020123456', 'BUS1201', 'C+', 2],
+    ['2020123456', 'MAT1101', 'D+', 4],
+    ['2019876543', 'EEE3101', 'B', 4],
+    ['2019876543', 'EEE3102', 'B-', 4],
+    ['2019876543', 'EEE2103', 'C+', 3],
+    ['2019876543', 'PHY2201', 'B+', 4],
+    ['2019876543', 'MAT2102', 'C', 4],
+    ['2019876543', 'ENG1101', 'A-', 2],
+  ];
+  for (const row of results) {
+    await pool.query(
+      'INSERT INTO academic_results (student_id, course_code, grade, credits) VALUES (?, ?, ?, ?)',
+      row,
+    );
+  }
+
+  const helsb = [
+    ['2021465934', 'APPROVED', 'DISBURSED', 'CLEARED', '2024/2025 loan contract active', 'HELSB-2026-000001', 100],
+    ['2022030346', 'UNDER_REVIEW', 'PENDING', 'PENDING', 'Awaiting automated screening outcome', 'HELSB-2026-000002', 75],
+    ['2020123456', 'NOT_ELIGIBLE', 'UNPAID', 'FAILED', 'Outstanding fees exceed allowed threshold', 'HELSB-2026-000003', 50],
+    ['2019876543', 'APPROVED', 'PARTIALLY_PAID', 'CLEARED', '2024/2025 engineering loan approved', 'HELSB-2026-000004', 75],
+    ['2019876543', 'COMPLETED', 'DISBURSED', 'CLEARED', '2023/2024 loan cycle completed', 'HELSB-2026-000005', 100],
+  ];
+  for (const row of helsb) {
+    await pool.query(
+      `INSERT INTO helsb_applications
+        (student_id, application_status, payment_status, screening_result, contract_details, application_number, loan_percent)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      row,
+    );
+  }
+
+  await pool.query(
+    `INSERT INTO notifications (student_id, title, message, type, channel, is_read, link, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, NOW())`,
+    ['2021465934', 'Welcome to VeriScreen', 'Your verified academic record is ready.', 'INFO', 'IN_APP', 0, '/student/dashboard'],
+  );
+}
+
+export async function findStudent(id) {
+  const [rows] = await pool.query('SELECT * FROM students WHERE id = ?', [id]);
+  return rows[0] || null;
+}
