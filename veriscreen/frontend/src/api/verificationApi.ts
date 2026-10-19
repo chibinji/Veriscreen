@@ -1,46 +1,31 @@
 import type { VerificationResult } from '../types';
-import { addAudit, getDb } from '../data/store';
-import { delay, fail } from './mockClient';
+import { fail } from './mockClient';
+import apiClient from '../services/apiClient';
 
 export const verificationApi = {
   async verify(code: string): Promise<VerificationResult> {
-    await delay(600);
-    const doc = getDb().documents.find((item) => item.verificationCode === code);
-    if (!doc) fail(404, 'Verification code not found.');
-
-    let status: VerificationResult['status'] = 'VALID';
-    if (doc.status === 'INVALID') status = 'INVALID';
-    if (doc.status === 'EXPIRED' || (doc.expiresAt && new Date(doc.expiresAt).getTime() < Date.now())) {
-      status = 'EXPIRED';
-    }
-
-    addAudit({
-      action: 'VERIFY_DOCUMENT',
-      performedBy: 'public',
-      targetEntity: 'Document',
-      targetId: String(doc.id),
-      details: `Public verification of ${code} → ${status}`,
+    const { data } = await apiClient.get<{
+      valid: boolean;
+      documentType?: string | null;
+      studentNumber?: string | null;
+      studentName?: string | null;
+      generatedAt?: string | null;
+    }>(`/api/verify/${encodeURIComponent(code)}`, {
+      headers: { Accept: 'application/json' },
     });
-
+    if (!data.valid) fail(404, 'Verification code not found.');
     return {
-      status,
-      documentType: doc.type,
-      studentNumber: doc.studentNumber,
-      studentName: doc.studentName,
-      generatedAt: doc.generatedAt,
+      status: 'VALID',
+      documentType: (data.documentType || 'TRANSCRIPT') as VerificationResult['documentType'],
+      studentNumber: data.studentNumber || '—',
+      studentName: data.studentName || '—',
+      generatedAt: data.generatedAt || new Date().toISOString(),
       verifiedAt: new Date().toISOString(),
-      issuedBy: doc.type === 'CONTRACT' ? 'Higher Education Loans and Scholarships Board' : 'University of Zambia',
+      issuedBy: 'University of Zambia',
     };
   },
 
-  async logVerification(code: string, verifierInfo: { name: string; organization: string }): Promise<void> {
-    await delay(200);
-    addAudit({
-      action: 'VERIFY_DOCUMENT',
-      performedBy: verifierInfo.name || 'public',
-      targetEntity: 'Document',
-      targetId: code,
-      details: `Logged verification for ${verifierInfo.organization || 'unknown organisation'}`,
-    });
+  async logVerification(_code: string, _verifierInfo: { name: string; organization: string }): Promise<void> {
+    return undefined;
   },
 };

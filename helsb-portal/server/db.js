@@ -107,6 +107,16 @@ export async function initDatabase() {
     await pool.query(statement);
   }
   await seedIfEmpty();
+  try {
+    await pool.query('ALTER TABLE applications ADD COLUMN pipeline_stage VARCHAR(40)');
+  } catch {
+    // The column is already present.
+  }
+  try {
+    await pool.query('ALTER TABLE applications ADD COLUMN screening_explanation VARCHAR(255)');
+  } catch {
+    // The column is already present.
+  }
 }
 
 async function seedIfEmpty() {

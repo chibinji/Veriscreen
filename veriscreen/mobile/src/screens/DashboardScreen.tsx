@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
@@ -6,15 +6,18 @@ import type { TabParamList } from '../navigation/RootNavigator';
 import { useAuth } from '../auth/AuthContext';
 import { studentApi } from '../api/studentApi';
 import { ErrorBanner, LoadingBlock } from '../components/Feedback';
-import { StatCard } from '../components/StatCard';
 import { StatusBadge } from '../components/StatusBadge';
-import type { DashboardStats, DocumentRecord } from '../types';
-import { colors, spacing } from '../theme';
+import { ScreeningNote, Tracker } from '../components/Tracker';
+import type { DocumentRecord, HelsbApplication } from '../types';
+import { spacing } from '../theme';
+import { useTheme } from '../theme/ThemeContext';
 
 export default function DashboardScreen() {
   const { user, token } = useAuth();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const navigation = useNavigation<BottomTabNavigationProp<TabParamList>>();
-  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [application, setApplication] = useState<HelsbApplication | null>(null);
   const [documents, setDocuments] = useState<DocumentRecord[]>([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
@@ -24,11 +27,11 @@ export default function DashboardScreen() {
     if (!token) return;
     setError('');
     try {
-      const [nextStats, nextDocs] = await Promise.all([
-        studentApi.getDashboardStats(token),
+      const [nextHelsb, nextDocs] = await Promise.all([
+        studentApi.getHelsb(token),
         studentApi.getDocuments(token),
       ]);
-      setStats(nextStats);
+      setApplication(nextHelsb);
       setDocuments(nextDocs);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to load dashboard.');
@@ -50,19 +53,23 @@ export default function DashboardScreen() {
       contentContainerStyle={styles.content}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); load(); }} />}
     >
-      <Text style={styles.hello}>Welcome back,</Text>
-      <Text style={styles.name}>{user?.firstName || 'Student'}</Text>
-      <Text style={styles.sub}>Overview of your verified academic records.</Text>
+      <Text style={styles.hello}>Welcome {`${user?.firstName || ''} ${user?.lastName || ''}`.trim() || 'there'}!</Text>
 
       <ErrorBanner message={error} />
       {loading ? (
         <LoadingBlock text="Loading dashboard…" />
       ) : (
         <>
-          <View style={styles.stats}>
-            <StatCard title="Documents verified" value={stats?.documentsGenerated ?? 0} icon="document-text-outline" />
-            <View style={{ width: 12 }} />
-            <StatCard title="Active applications" value={stats?.activeApplications ?? 0} icon="send-outline" />
+          <View style={styles.trackerCard}>
+            <Text style={styles.trackerLabel}>HELSB application</Text>
+            {application ? (
+              <>
+                <Tracker stage={application.pipelineStage} />
+                <ScreeningNote text={application.screeningExplanation} />
+              </>
+            ) : (
+              <Text style={styles.emptyLight}>Not started</Text>
+            )}
           </View>
 
           <View style={styles.card}>
@@ -92,13 +99,21 @@ export default function DashboardScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: {
+  surface: string; white: string; border: string; navy: string; ink: string; muted: string; lapis: string;
+}) {
+  return StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.surface },
   content: { padding: spacing.md, paddingBottom: 40 },
-  hello: { color: colors.muted, fontWeight: '600' },
-  name: { fontSize: 28, fontWeight: '800', color: colors.lapis },
-  sub: { color: colors.muted, marginBottom: spacing.md },
-  stats: { flexDirection: 'row', marginBottom: spacing.md },
+  hello: { fontSize: 26, fontWeight: '700', color: colors.navy, marginBottom: spacing.md },
+  trackerCard: {
+    backgroundColor: colors.ink,
+    borderRadius: 20,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+  },
+  trackerLabel: { color: '#d5e4de', fontWeight: '700', letterSpacing: 0.4 },
+  emptyLight: { color: '#fff', fontSize: 20, fontWeight: '800', marginTop: 8 },
   card: {
     backgroundColor: colors.white,
     borderRadius: 16,
@@ -119,4 +134,5 @@ const styles = StyleSheet.create({
   },
   docTitle: { fontWeight: '700', color: colors.navy },
   docMeta: { color: colors.muted, fontSize: 12, marginTop: 2 },
-});
+  });
+}

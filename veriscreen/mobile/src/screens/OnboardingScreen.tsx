@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
   },
   heroImage: { width: '100%', height: '100%' },
   heroShade: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(11, 29, 54, 0.32)',
   },
   heroTopFade: {

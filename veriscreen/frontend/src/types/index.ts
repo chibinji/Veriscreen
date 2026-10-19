@@ -184,6 +184,8 @@ export interface Application {
   mobileMoneyPhone?: string;
   mobileMoneyProvider?: string;
   submittedDocumentIds?: string;
+  pipelineStage?: string | null;
+  screeningExplanation?: string | null;
   contractAvailable?: boolean;
   nrc?: string;
   email?: string;

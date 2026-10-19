@@ -18,6 +18,7 @@ const NAV = [
 ];
 
 const BOTTOM_NAV = [
+  { label: 'Help', path: '/student/help', icon: 'bi-question-circle' },
   { label: 'Settings', path: '/student/settings', icon: 'bi-gear' },
 ];
 
@@ -39,6 +40,7 @@ const StudentLayout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [open, setOpen] = useState(false);
+  const [confirmSignOut, setConfirmSignOut] = useState(false);
 
   const profileQuery = useQuery({
     queryKey: useSessionQueryKey('student-profile'),
@@ -123,12 +125,35 @@ const StudentLayout: React.FC = () => {
               </NavLink>
             );
           })}
-          <button type="button" className="studio-nav__link studio-nav__button" onClick={signOut}>
+          <button type="button" className="studio-nav__link studio-nav__button" onClick={() => setConfirmSignOut(true)}>
             <i className="bi bi-box-arrow-right" />
             Sign out
           </button>
         </nav>
       </aside>
+
+      {confirmSignOut && (
+        <div className="studio-confirm" role="presentation" onClick={() => setConfirmSignOut(false)}>
+          <div
+            className="studio-confirm__card"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="sign-out-title"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <h2 id="sign-out-title">Sign out?</h2>
+            <p>Are you sure you want to sign out of VeriScreen?</p>
+            <div className="studio-confirm__actions">
+              <button type="button" className="studio-confirm__stay" onClick={() => setConfirmSignOut(false)}>
+                Stay signed in
+              </button>
+              <button type="button" className="studio-confirm__leave" onClick={signOut}>
+                Sign out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="studio-stage">
         <Outlet />

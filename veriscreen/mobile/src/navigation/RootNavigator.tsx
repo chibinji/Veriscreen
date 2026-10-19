@@ -11,7 +11,7 @@ import ProfileScreen from '../screens/ProfileScreen';
 import DocumentsScreen from '../screens/DocumentsScreen';
 import RecordsScreen from '../screens/RecordsScreen';
 import HelsbScreen from '../screens/HelsbScreen';
-import { colors } from '../theme';
+import { useTheme } from '../theme/ThemeContext';
 
 export type TabParamList = {
   Home: undefined;
@@ -24,26 +24,17 @@ export type TabParamList = {
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator<TabParamList>();
 
-const navTheme = {
-  ...DefaultTheme,
-  colors: {
-    ...DefaultTheme.colors,
-    background: colors.surface,
-    primary: colors.indigo,
-    text: colors.navy,
-    card: colors.white,
-    border: colors.border,
-  },
-};
-
 function StudentTabs() {
+  const { colors } = useTheme();
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
+        headerStyle: { backgroundColor: colors.white },
         headerTitleStyle: { fontWeight: '800', color: colors.navy },
-        tabBarActiveTintColor: colors.indigo,
+        headerTintColor: colors.navy,
+        tabBarActiveTintColor: colors.ink,
         tabBarInactiveTintColor: colors.muted,
-        tabBarStyle: { borderTopColor: colors.border },
+        tabBarStyle: { borderTopColor: colors.border, backgroundColor: colors.white },
         tabBarIcon: ({ color, size }) => {
           const icons: Record<string, keyof typeof Ionicons.glyphMap> = {
             Home: 'home-outline',
@@ -67,6 +58,18 @@ function StudentTabs() {
 
 export default function RootNavigator() {
   const { user, ready } = useAuth();
+  const { colors } = useTheme();
+  const navTheme = {
+    ...DefaultTheme,
+    colors: {
+      ...DefaultTheme.colors,
+      background: colors.surface,
+      primary: colors.indigo,
+      text: colors.navy,
+      card: colors.white,
+      border: colors.border,
+    },
+  };
 
   if (!ready) {
     return (

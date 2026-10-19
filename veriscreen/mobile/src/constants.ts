@@ -14,11 +14,20 @@ export const API_ENDPOINTS = {
   ME_HELSB: '/api/v1/students/me/helsb',
 } as const;
 
+export const TRACKER_STEPS = [
+  { id: 'SUBMITTED', label: 'Submitted' },
+  { id: 'PORTAL_CONFIRMED', label: 'Portal confirmed' },
+  { id: 'PAYMENT', label: 'Payment' },
+  { id: 'SCREENING', label: 'Screening' },
+  { id: 'CONTRACT', label: 'Contract' },
+  { id: 'DISBURSEMENT', label: 'Disbursement' },
+] as const;
+
 export const DEMO_ACCOUNTS = [
-  { label: 'Samuel Mwanza (approved HELSB)', id: '2021465934', password: 'password123' },
-  { label: 'Nosiku Mukuka (under review)', id: '2022030346', password: 'password123' },
-  { label: 'Grace Banda (outstanding fees)', id: '2020123456', password: 'password123' },
-  { label: 'Peter Zulu (multi-year)', id: '2019876543', password: 'password123' },
+  { label: 'Samuel Chibinji Mwanza', id: '2021465934', password: 'password123' },
+  { label: 'Nosiku Mukuka', id: '2022030346', password: 'password123' },
+  { label: 'Grace Banda', id: '2020123456', password: 'password123' },
+  { label: 'Peter Zulu', id: '2019876543', password: 'password123' },
 ];
 
 export const DOCUMENT_LABELS: Record<string, string> = {
@@ -37,10 +46,11 @@ export function getApiBaseUrl(): string {
   const fromEnv = process.env.EXPO_PUBLIC_API_URL;
   if (fromEnv) return fromEnv.replace(/\/$/, '');
 
-  const hostUri = Constants.expoConfig?.hostUri || Constants.linkingUri;
-  const host = hostUri?.match(/\d+\.\d+\.\d+\.\d+/)?.[0];
-  if (host) return `http://${host}:8080`;
+  const hostUri = Constants.expoConfig?.hostUri || Constants.expoGoConfig?.debuggerHost || Constants.linkingUri || '';
+  const hosts = hostUri.match(/\d+\.\d+\.\d+\.\d+/g) || [];
+  const lan = hosts.find((address) => /^(10\.|192\.168\.)/.test(address));
+  if (lan) return `http://${lan}:8081`;
 
-  if (Platform.OS === 'android') return 'http://10.0.2.2:8080';
-  return 'http://localhost:8080';
+  if (Platform.OS === 'android') return 'http://10.0.2.2:8081';
+  return 'http://localhost:8081';
 }

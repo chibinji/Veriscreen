@@ -8,7 +8,7 @@ import { APP_NAME } from '../../constants';
 import BrandLogo from '../../components/brand/BrandLogo';
 
 const statusConfig = {
-  VALID: { icon: 'bi-patch-check-fill', color: 'success', title: 'Document Verified', desc: 'This document is authentic and has been verified.' },
+  VALID: { icon: 'bi-patch-check-fill', color: 'success', title: 'Document verified', desc: 'This document is authentic and has been verified.' },
   INVALID: { icon: 'bi-patch-exclamation-fill', color: 'danger', title: 'Invalid Document', desc: 'This document could not be verified. It may have been tampered with.' },
   EXPIRED: { icon: 'bi-clock-history', color: 'warning', title: 'Document Expired', desc: 'This document has expired and is no longer valid.' },
 };

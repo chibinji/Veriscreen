@@ -112,6 +112,7 @@ function Shell({ children }: { children: React.ReactNode }) {
           <button
             className="btn btn-sm btn-outline-light rounded-pill"
             onClick={() => {
+              if (!window.confirm('Are you sure you want to sign out?')) return;
               clearToken();
               navigate('/login');
             }}
@@ -374,6 +375,31 @@ function ProgrammeScreening() {
   );
 }
 
+function nextTrackerLabel(stage?: string | null) {
+  const labels: Record<string, string> = {
+    SUBMITTED: 'Confirm in the portal',
+    PORTAL_CONFIRMED: 'Record payment',
+    PAYMENT: 'Approve screening',
+    SCREENING: 'Issue contract',
+    CONTRACT: 'Mark disbursed',
+    DISBURSEMENT: 'Disbursement complete',
+  };
+  return labels[stage || 'SUBMITTED'] || 'Update tracker';
+}
+
+function Tracker({ stage }: { stage?: string | null }) {
+  const steps = ['Submitted', 'Portal confirmed', 'Payment', 'Screening', 'Contract', 'Disbursement'];
+  const ids = ['SUBMITTED', 'PORTAL_CONFIRMED', 'PAYMENT', 'SCREENING', 'CONTRACT', 'DISBURSEMENT'];
+  const current = Math.max(0, ids.indexOf(stage || 'SUBMITTED'));
+  return (
+    <ol className="tracker">
+      {steps.map((label, index) => (
+        <li key={label} className={index < current ? 'done' : index === current ? 'current' : ''}>{label}</li>
+      ))}
+    </ol>
+  );
+}
+
 function ScreeningDetail({
   applicationId,
   startReview,
@@ -403,17 +429,18 @@ function ScreeningDetail({
 
   if (!data) return <p>{error || 'Loading…'}</p>;
   const app = data.application;
-  const decided = app.status === 'CONFIRMED' || app.status === 'REJECTED' || Boolean(app.screeningApproved);
 
-  const approve = async () => {
+  const advance = async () => {
     setError('');
     try {
-      const updated = await helsbApi.approveScreening(app.id);
-      setMessage('Screening request approved.');
-      await load();
+      const updated = await helsbApi.advance(app.id);
+      setMessage(updated.screeningExplanation && updated.pipelineStage === 'SCREENING'
+        ? updated.screeningExplanation
+        : 'The student tracker moved forward.');
+      setData((current) => (current ? { ...current, application: updated } : current));
       onUpdated?.(updated);
     } catch {
-      setError('The screening request could not be approved.');
+      setError('The student tracker could not be updated.');
     }
   };
 
@@ -467,9 +494,23 @@ function ScreeningDetail({
         )}
       </div>
       <div className="card shadow-sm p-4 mb-3">
-        <h5>Approve screening</h5>
-        <button className="btn btn-helsb mt-2" disabled={decided} onClick={approve}>
-          {app.screeningApproved ? 'Screening approved' : 'Approve screening request'}
+        <h5>Student tracker</h5>
+        <p className="text-muted">Each step updates the student’s VeriScreen dashboard.</p>
+        <Tracker stage={app.pipelineStage} />
+        {app.screeningExplanation && (
+          <p className={`screen-result ${app.screeningExplanation.startsWith('Approved') ? 'ok' : 'no'}`}>
+            {app.screeningExplanation}
+          </p>
+        )}
+        <button
+          className="btn btn-helsb mt-3"
+          type="button"
+          disabled={app.pipelineStage === 'DISBURSEMENT' || (app.pipelineStage === 'SCREENING' && app.screeningExplanation?.startsWith('Not eligible'))}
+          onClick={advance}
+        >
+          {app.pipelineStage === 'SCREENING' && app.screeningExplanation?.startsWith('Not eligible')
+            ? 'Screening complete'
+            : nextTrackerLabel(app.pipelineStage)}
         </button>
       </div>
       <div className="card shadow-sm p-4">

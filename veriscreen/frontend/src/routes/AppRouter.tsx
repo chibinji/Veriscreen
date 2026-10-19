@@ -18,6 +18,7 @@ import FeeHistoryRecordPage from '../pages/student/FeeHistoryRecordPage';
 import AcademicResultsRecordPage from '../pages/student/AcademicResultsRecordPage';
 import StudentActivityPage from '../pages/student/StudentActivityPage';
 import SettingsPage from '../pages/SettingsPage';
+import HelpPage from '../pages/student/HelpPage';
 import ProfilePage from '../pages/ProfilePage';
 
 import HelsbStudentDashboard from '../pages/helsb/HelsbStudentDashboard';
@@ -69,6 +70,7 @@ const AppRouter: React.FC = () => (
       <Route path="/student/records/fees" element={<FeeHistoryRecordPage />} />
       <Route path="/student/records/results" element={<AcademicResultsRecordPage />} />
       <Route path="/student/activity" element={<StudentActivityPage />} />
+      <Route path="/student/help" element={<HelpPage />} />
       <Route path="/student/settings" element={<SettingsPage />} />
       <Route path="/student/notifications" element={<NotificationsPage />} />
     </Route>

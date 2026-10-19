@@ -177,7 +177,7 @@ const StudentApplications: React.FC = () => {
                     <StatusBadge status={application?.status || 'PENDING'} label={application ? getHelsbStatusLabel(application.status) : 'Not submitted'} />
                   )}
                   <p className="small text-muted mt-2 mb-0">
-                    Screening result: {application?.screeningResult || 'Not available'}
+                    {application?.screeningExplanation || 'Screening result: Not available'}
                   </p>
                 </div>
               </div>

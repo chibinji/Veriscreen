@@ -200,3 +200,52 @@ body {
   border-radius: 14px;
   padding: 1.2rem;
 }
+.tracker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.tracker li {
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  background: #eef2f8;
+  color: #607089;
+  font-size: 0.82rem;
+}
+.tracker li.done { background: #d9f5e4; color: #0f7b3a; }
+.tracker li.current { background: #1f7a34; color: white; }
+.screen-result {
+  margin: 14px 0 0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-weight: 650;
+  line-height: 1.45;
+}
+.screen-result.ok { background: #d9f5e4; color: #0f7b3a; }
+.screen-result.no { background: #fde8e8; color: #9b1c1c; }
+@media (max-width: 720px) {
+  .helsb-topbar {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 12px !important;
+  }
+  .officer-name { font-size: 0.92rem; }
+  .container { padding-left: 12px; padding-right: 12px; }
+  .page-title { font-size: 1.45rem; }
+  .uni-card, .school-card { padding: 1rem; }
+  .school-card .d-flex { flex-direction: column; }
+  .school-card .btn { width: 100%; }
+  .card .d-flex.justify-content-between { flex-wrap: wrap; }
+  .card .fw-semibold,
+  .card .text-end { overflow-wrap: anywhere; text-align: left !important; }
+  .document-row { flex-direction: column; align-items: stretch; }
+  .doc-frame { height: 52vh; }
+  .tracker li { font-size: 0.75rem; }
+  .login-card { padding: 1.4rem 1rem 1.5rem; }
+  .login-subtitle { font-size: 0.84rem; }
+  input, select, textarea { font-size: 16px; }
+  .table-responsive { -webkit-overflow-scrolling: touch; }
+}

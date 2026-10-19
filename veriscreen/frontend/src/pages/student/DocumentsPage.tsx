@@ -25,12 +25,22 @@ const DocumentsPage: React.FC = () => {
     documentService.downloadDocument(id, `${type}_${id}.pdf`);
   };
 
+  const closePreview = () => {
+    setPreviewUrl((current) => {
+      if (current?.startsWith('blob:')) URL.revokeObjectURL(current);
+      return null;
+    });
+  };
+
   const handlePreview = async (id: number) => {
     try {
       const url = await documentService.previewDocument(id);
-      setPreviewUrl(url);
+      setPreviewUrl((current) => {
+        if (current?.startsWith('blob:')) URL.revokeObjectURL(current);
+        return url;
+      });
     } catch {
-      setError('Unable to preview document.');
+      setError('Unable to open the PDF.');
     }
   };
 
@@ -126,12 +136,12 @@ const DocumentsPage: React.FC = () => {
       </div>
 
       {previewUrl && (
-        <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }} onClick={() => setPreviewUrl(null)}>
+        <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }} onClick={closePreview}>
           <div className="modal-dialog modal-xl modal-dialog-centered" onClick={(e) => e.stopPropagation()}>
             <div className="modal-content">
               <div className="modal-header">
-                <h6 className="modal-title fw-semibold text-navy">Document Preview</h6>
-                <button type="button" className="btn-close" onClick={() => setPreviewUrl(null)} />
+                <h6 className="modal-title fw-semibold text-navy">Document preview</h6>
+                <button type="button" className="btn-close" onClick={closePreview} />
               </div>
               <div className="modal-body p-0">
                 <iframe src={previewUrl} style={{ width: '100%', height: '70vh', border: 'none' }} title="Document Preview" />

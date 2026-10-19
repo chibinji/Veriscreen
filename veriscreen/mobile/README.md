@@ -1,52 +1,29 @@
 # VeriScreen mobile app
 
-Expo (React Native) student app for the existing Spring Boot API.
-
-It uses the same endpoints as the web portal:
-
-- `POST /api/v1/auth/login`
-- `GET /api/v1/students/me/profile`
-- `GET /api/v1/students/me/documents`
-- `GET /api/v1/students/me/registrations`
-- `GET /api/v1/students/me/fees`
-- `GET /api/v1/students/me/examinations`
-- `GET /api/v1/students/me/academic-results`
-- `GET /api/v1/students/me/helsb`
-
-Officer, admin, register, and HELSB-student flows are not included because the backend does not provide those APIs.
+Expo student app for the Node.js student API on port 8081. It uses the same sign-in, records, documents, and HELSB tracker as the website.
 
 ## Run
 
-1. Start PostgreSQL and the backend (`cd backend && mvnw.cmd spring-boot:run`).
+1. Start the student API (`veriscreen/server`, port 8081).
 2. In another terminal:
 
 ```bash
-cd mobile
+cd veriscreen/mobile
 npm install
-npx expo start
+npx expo start --port 8085
 ```
 
-3. Scan the QR code with **Expo Go** on your phone (same Wi-Fi as the PC), or press `a` for an Android emulator.
+Metro uses port 8085 because the student API already uses 8081.
 
-## Connecting to the backend
+3. Install Expo Go on the phone, join the same Wi-Fi, and scan the QR code Expo prints.
 
-The app talks to port **8080**. A phone cannot use `localhost` — that would mean the phone itself.
-
-By default the app uses the same IP address Expo shows for Metro, plus port 8080. That usually works on a physical device.
-
-| Where the app runs | API URL |
-|---|---|
-| Android emulator | `http://10.0.2.2:8080` |
-| iOS simulator | `http://localhost:8080` |
-| Physical phone | `http://YOUR_PC_LAN_IP:8080` |
-
-To force a URL, copy `.env.example` to `.env` and set `EXPO_PUBLIC_API_URL`.
+The API address is `EXPO_PUBLIC_API_URL` in `.env`. A phone cannot use `localhost`.
 
 ## Demo logins
 
-Password for all seeded students: `password123`
+Password for every student: `password123`
 
-| Student ID | Name |
+| Computer number | Name |
 |---|---|
 | `2021465934` | Samuel Chibinji Mwanza |
 | `2022030346` | Nosiku Mukuka |

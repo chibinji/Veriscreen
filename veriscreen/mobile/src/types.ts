@@ -25,6 +25,7 @@ export interface StudentProfile {
 
 export interface DocumentRecord {
   id: number;
+  officialId: string;
   type: DocumentType;
   typeLabel: string;
   summary: string;
@@ -70,6 +71,8 @@ export interface HelsbApplication {
   status: string;
   paymentStatus?: string;
   screeningResult?: string;
+  screeningExplanation?: string;
+  pipelineStage?: string | null;
   notes?: string;
   loanPercent?: number;
 }

@@ -1,13 +1,13 @@
 export const colors = {
-  indigo: '#1b7a4a',
-  gold: '#c4a35a',
-  navy: '#14352a',
-  lapis: '#2f9e6a',
-  ink: '#14352a',
-  surface: '#d7e4db',
+  indigo: '#3e564f',
+  gold: '#e3b23c',
+  navy: '#2f4741',
+  lapis: '#3e564f',
+  ink: '#3e564f',
+  surface: '#e7f1ee',
   white: '#ffffff',
-  muted: '#5b6573',
-  border: '#d7e6db',
+  muted: '#5d726b',
+  border: '#d5e4de',
   success: '#198754',
   warning: '#b58100',
   danger: '#dc3545',
@@ -20,6 +20,10 @@ export const spacing = {
   md: 16,
   lg: 24,
   xl: 32,
+};
+
+export const radii = {
+  control: 999,
 };
 
 export function statusColor(status: string): string {

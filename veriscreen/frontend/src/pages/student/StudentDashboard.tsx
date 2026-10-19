@@ -16,6 +16,29 @@ function activityLabel(type: DocumentType): string {
   return 'Document verified';
 }
 
+const TRACKER_STEPS = [
+  { id: 'SUBMITTED', label: 'Submitted' },
+  { id: 'PORTAL_CONFIRMED', label: 'Portal confirmed' },
+  { id: 'PAYMENT', label: 'Payment' },
+  { id: 'SCREENING', label: 'Screening' },
+  { id: 'CONTRACT', label: 'Contract' },
+  { id: 'DISBURSEMENT', label: 'Disbursement' },
+];
+
+function Tracker({ stage }: { stage?: string }) {
+  const current = Math.max(0, TRACKER_STEPS.findIndex((step) => step.id === stage));
+  return (
+    <ol className="studio-tracker">
+      {TRACKER_STEPS.map((step, index) => (
+        <li key={step.id} className={index < current ? 'is-done' : index === current ? 'is-current' : ''}>
+          <span>{index + 1}</span>
+          {step.label}
+        </li>
+      ))}
+    </ol>
+  );
+}
+
 const StudentDashboard: React.FC = () => {
   const user = useAuthStore((state) => state.user);
   const profileQuery = useQuery({
@@ -30,6 +53,7 @@ const StudentDashboard: React.FC = () => {
     queryKey: useSessionQueryKey('helsb-application'),
     queryFn: helsbService.getMyApplication,
     retry: false,
+    refetchInterval: 3000,
   });
 
   const profile = profileQuery.data;
@@ -75,17 +99,24 @@ const StudentDashboard: React.FC = () => {
       ) : (
         <>
           <article className="studio-tile studio-tile--ink studio-tile--status">
-            <p>HELSB status</p>
-            <strong>{started ? 'Submitted, awaiting portal confirmation' : 'Not started'}</strong>
-            <span>
-              {started
-                ? 'The result is confirmed in the HELSB portal.'
-                : 'You have not sent an application yet.'}
-            </span>
-            {!started && (
-              <Link to="/student/applications" className="studio-apply">
-                Apply to HELSB
-              </Link>
+            <p>HELSB application</p>
+            {started ? (
+              <>
+                <Tracker stage={application?.pipelineStage} />
+                {application?.screeningExplanation && (
+                  <p className={`studio-screen ${application.screeningExplanation.startsWith('Approved') ? 'is-ok' : ''}`}>
+                    {application.screeningExplanation}
+                  </p>
+                )}
+              </>
+            ) : (
+              <>
+                <strong>Not started</strong>
+                <span>You have not sent an application yet.</span>
+                <Link to="/student/applications" className="studio-apply">
+                  Apply to HELSB
+                </Link>
+              </>
             )}
           </article>
 

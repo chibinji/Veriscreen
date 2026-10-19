@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '../auth/AuthContext';
@@ -6,9 +6,12 @@ import { studentApi } from '../api/studentApi';
 import { EmptyState, ErrorBanner, LoadingBlock } from '../components/Feedback';
 import { StatusBadge } from '../components/StatusBadge';
 import type { AcademicResult, ExamRecord, FeeRecord, RegistrationRecord } from '../types';
-import { colors, spacing } from '../theme';
+import { spacing } from '../theme';
+import { useTheme } from '../theme/ThemeContext';
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   return (
     <View style={styles.card}>
       <Text style={styles.cardTitle}>{title}</Text>
@@ -19,6 +22,8 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 export default function RecordsScreen() {
   const { token } = useAuth();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [regs, setRegs] = useState<RegistrationRecord[]>([]);
   const [fees, setFees] = useState<FeeRecord[]>([]);
   const [exams, setExams] = useState<ExamRecord[]>([]);
@@ -138,7 +143,10 @@ export default function RecordsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: {
+  surface: string; white: string; border: string; navy: string; muted: string; indigo: string;
+}) {
+  return StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.surface },
   content: { padding: spacing.md, paddingBottom: 40 },
   card: {
@@ -161,4 +169,5 @@ const styles = StyleSheet.create({
   primary: { fontWeight: '700', color: colors.navy },
   meta: { color: colors.muted, fontSize: 12, marginTop: 2 },
   grade: { fontWeight: '800', color: colors.indigo, fontSize: 18 },
-});
+  });
+}

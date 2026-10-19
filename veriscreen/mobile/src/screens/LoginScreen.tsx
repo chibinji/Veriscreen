@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -13,10 +13,13 @@ import { BrandLogo } from '../components/BrandLogo';
 import { ErrorBanner } from '../components/Feedback';
 import { DEMO_ACCOUNTS } from '../constants';
 import { useAuth } from '../auth/AuthContext';
-import { colors, spacing } from '../theme';
+import { spacing } from '../theme';
+import { useTheme } from '../theme/ThemeContext';
 
 export default function LoginScreen() {
   const { login } = useAuth();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [studentId, setStudentId] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -98,7 +101,10 @@ export default function LoginScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: {
+  surface: string; white: string; border: string; navy: string; muted: string; ink: string; gold: string;
+}) {
+  return StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.surface },
   content: { padding: spacing.lg, paddingTop: 72 },
   heading: { marginTop: spacing.lg, fontSize: 28, fontWeight: '800', color: colors.navy },
@@ -118,18 +124,30 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 12,
-    color: colors.ink,
-    backgroundColor: '#fbfcfe',
+    color: colors.navy,
+    backgroundColor: colors.surface,
   },
   button: {
     marginTop: spacing.md,
-    backgroundColor: 'rgba(255,255,255,0.28)',
-    borderWidth: 1.5,
-    borderColor: 'rgba(27,122,74,0.4)',
-    borderRadius: radii.control,
+    backgroundColor: colors.gold,
+    borderRadius: 999,
     paddingVertical: 16,
     alignItems: 'center',
   },
   buttonDisabled: { opacity: 0.7 },
-  buttonText: { color: colors.navy, fontWeight: '700', fontSize: 16 },
-});
+  buttonText: { color: '#2f4741', fontWeight: '700', fontSize: 16 },
+  demoTitle: { fontWeight: '800', color: colors.navy, marginBottom: 4 },
+  demoHint: { color: colors.muted, marginBottom: spacing.sm },
+  demoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 10,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+  },
+  demoId: { fontWeight: '800', color: colors.navy },
+  demoLabel: { color: colors.muted, marginTop: 2 },
+  use: { color: colors.ink, fontWeight: '700' },
+  });
+}

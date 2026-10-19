@@ -23,6 +23,7 @@ export interface BackendDocument {
   url?: string | null;
   summary?: string | null;
   generatedDate?: string | null;
+  documentId?: string | null;
 }
 
 export interface BackendRegistration {
@@ -63,6 +64,8 @@ export interface BackendHelsbApplication {
   contractDetails?: string | null;
   applicationNumber?: string | null;
   loanPercent?: number | null;
+  pipelineStage?: string | null;
+  screeningExplanation?: string | null;
 }
 
 export interface BackendJwtResponse {
@@ -123,6 +126,7 @@ export function toDocument(dto: BackendDocument, index: number): DocumentRecord 
   const type = documentType(dto.type);
   return {
     id: index + 1,
+    officialId: dto.documentId || dto.summary || `document-${index + 1}`,
     type,
     typeLabel: DOCUMENT_LABELS[type] || dto.type || 'Document',
     summary: dto.summary || '—',
@@ -196,6 +200,8 @@ export function toHelsb(dto: BackendHelsbApplication): HelsbApplication {
     status: mapped,
     paymentStatus: dto.paymentStatus || undefined,
     screeningResult: dto.screeningResult || undefined,
+    screeningExplanation: dto.screeningExplanation || undefined,
+    pipelineStage: dto.pipelineStage || null,
     notes: notes || undefined,
     loanPercent: dto.loanPercent ?? undefined,
   };

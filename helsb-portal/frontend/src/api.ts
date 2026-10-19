@@ -5,19 +5,32 @@ export const DOCUMENT_VERIFY_BASE = import.meta.env.VITE_VERIFY_BASE || 'http://
 
 export const api = axios.create({ baseURL: '' });
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem(TOKEN_KEY);
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
-
 export function saveToken(token: string) {
   localStorage.setItem(TOKEN_KEY, token);
 }
 
 export function clearToken() {
   localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem('helsb_officer_name');
 }
+
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem(TOKEN_KEY);
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const url = String(error.config?.url || '');
+    if (error.response?.status === 401 && !url.includes('/auth/login')) {
+      clearToken();
+      if (!window.location.pathname.startsWith('/login')) window.location.assign('/login');
+    }
+    return Promise.reject(error);
+  },
+);
 
 export function hasToken() {
   return Boolean(localStorage.getItem(TOKEN_KEY));
@@ -37,6 +50,8 @@ export interface Application {
   screeningPercent?: number;
   screeningApproved?: boolean;
   status: string;
+  pipelineStage?: string | null;
+  screeningExplanation?: string | null;
   documentIds: string[];
   notes?: string;
   submittedAt?: string;
@@ -99,6 +114,8 @@ export const helsbApi = {
     api.post(`/api/v1/officer/applications/${id}/approve-screening`, { comment: comment || 'Screening request approved' }).then(
       (res) => res.data as Application,
     ),
+  advance: (id: number) =>
+    api.post(`/api/v1/officer/applications/${id}/advance`).then((res) => res.data as Application),
   reject: (id: number, comment: string) =>
     api.post(`/api/v1/officer/applications/${id}/reject`, { comment }).then((res) => res.data as Application),
 };

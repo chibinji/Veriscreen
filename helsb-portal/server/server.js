@@ -59,6 +59,8 @@ function toDto(row) {
     schoolName: row.school_name,
     screeningPercent: row.screening_percent,
     screeningApproved: Boolean(row.screening_approved),
+    screeningExplanation: row.screening_explanation || null,
+    pipelineStage: row.pipeline_stage || null,
     status: row.status,
     documentIds,
     notes: row.notes,
@@ -212,6 +214,87 @@ app.get('/api/v1/officer/applications/:id', requireOfficer, async (req, res, nex
   }
 });
 
+const PIPELINE = ['SUBMITTED', 'PORTAL_CONFIRMED', 'PAYMENT', 'SCREENING', 'CONTRACT', 'DISBURSEMENT'];
+
+function nextStage(current) {
+  const stage = PIPELINE.includes(current) ? current : 'SUBMITTED';
+  const index = PIPELINE.indexOf(stage);
+  return index < PIPELINE.length - 1 ? PIPELINE[index + 1] : stage;
+}
+
+async function saveStage(application, stage, officer, explanation) {
+  await pool.query(
+    'UPDATE applications SET pipeline_stage = ?, screening_explanation = COALESCE(?, screening_explanation) WHERE id = ?',
+    [stage, explanation || null, application.id],
+  );
+  await pool.query(
+    `INSERT INTO status_history (application_id, from_status, to_status, changed_by, comment, changed_at)
+     VALUES (?, ?, ?, ?, ?, NOW())`,
+    [application.id, application.pipeline_stage || application.status, stage, officer || 'officer', explanation || 'Student tracker updated'],
+  );
+  await notifyStudent(application.student_id, stage, application.application_number, explanation);
+  return requireApplication(application.id);
+}
+
+async function notifyStudent(studentId, stage, applicationNumber, explanation) {
+  const base = (process.env.VERISCREEN_URL || 'http://127.0.0.1:8081').replace(/\/$/, '');
+  try {
+    await fetch(`${base}/api/v1/internal/helsb-progress`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Internal-Key': process.env.INTERNAL_KEY || 'veriscreen-helsb-dev',
+      },
+      body: JSON.stringify({ studentId, stage, applicationNumber, explanation: explanation || null }),
+    });
+  } catch (error) {
+    console.error('Could not update the student tracker.', error.message);
+  }
+}
+
+async function screenStudent(studentId) {
+  const base = (process.env.VERISCREEN_URL || 'http://127.0.0.1:8081').replace(/\/$/, '');
+  try {
+    const response = await fetch(`${base}/api/v1/internal/screen`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Internal-Key': process.env.INTERNAL_KEY || 'veriscreen-helsb-dev',
+      },
+      body: JSON.stringify({ studentId }),
+    });
+    if (!response.ok) throw new Error('Screening failed');
+    return await response.json();
+  } catch (error) {
+    console.error('Could not screen the university record.', error.message);
+    return { approved: false, explanation: 'Not eligible: the university record could not be read.' };
+  }
+}
+
+app.post('/api/v1/officer/applications/:id/advance', requireOfficer, async (req, res, next) => {
+  try {
+    const application = await requireApplication(req.params.id);
+    if (application.screening_explanation && application.screening_explanation.startsWith('Not eligible') && application.pipeline_stage === 'SCREENING') {
+      res.json(toDto(application));
+      return;
+    }
+    const stage = nextStage(application.pipeline_stage);
+    if (stage === application.pipeline_stage) {
+      res.json(toDto(application));
+      return;
+    }
+    let explanation = null;
+    if (stage === 'SCREENING') {
+      const screen = await screenStudent(application.student_id);
+      explanation = screen.explanation;
+      await pool.query('UPDATE applications SET screening_approved = ? WHERE id = ?', [screen.approved ? 1 : 0, application.id]);
+    }
+    res.json(toDto(await saveStage(application, stage, req.officer, explanation)));
+  } catch (error) {
+    next(error);
+  }
+});
+
 app.post('/api/v1/officer/applications/:id/approve-screening', requireOfficer, async (req, res, next) => {
   try {
     const application = await requireApplication(req.params.id);
@@ -221,7 +304,14 @@ app.post('/api/v1/officer/applications/:id/approve-screening', requireOfficer, a
       return;
     }
     const comment = req.body?.comment || 'Screening request approved';
-    res.json(toDto(await decide(application.id, req.officer, 'CONFIRMED', comment)));
+    const decided = await decide(application.id, req.officer, 'CONFIRMED', comment);
+    const stage = 'SCREENING';
+    const currentIndex = PIPELINE.indexOf(decided.pipeline_stage || 'SUBMITTED');
+    if (currentIndex < PIPELINE.indexOf(stage)) {
+      res.json(toDto(await saveStage(decided, stage, req.officer)));
+      return;
+    }
+    res.json(toDto(decided));
   } catch (error) {
     next(error);
   }

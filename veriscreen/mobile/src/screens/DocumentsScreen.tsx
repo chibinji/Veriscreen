@@ -1,15 +1,19 @@
-import React, { useCallback, useState } from 'react';
-import { Modal, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useCallback, useMemo, useState } from 'react';
+import { Linking, Modal, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '../auth/AuthContext';
 import { studentApi } from '../api/studentApi';
 import { EmptyState, ErrorBanner, LoadingBlock } from '../components/Feedback';
 import { StatusBadge } from '../components/StatusBadge';
+import { getApiBaseUrl } from '../constants';
+import { spacing } from '../theme';
+import { useTheme } from '../theme/ThemeContext';
 import type { DocumentRecord } from '../types';
-import { colors, spacing } from '../theme';
 
 export default function DocumentsScreen() {
   const { token } = useAuth();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [documents, setDocuments] = useState<DocumentRecord[]>([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
@@ -51,11 +55,14 @@ export default function DocumentsScreen() {
           <View key={doc.id} style={styles.card}>
             <Text style={styles.title}>{doc.typeLabel}</Text>
             <Text style={styles.meta}>{doc.generatedAt || '—'}</Text>
-            <Text style={styles.summary}>{doc.summary}</Text>
+            <Text style={styles.summary}>{doc.officialId}</Text>
             <View style={styles.row}>
               <StatusBadge status="GENERATED" label="Verified" />
+              <Pressable onPress={() => Linking.openURL(`${getApiBaseUrl()}/verify/${doc.officialId}`)}>
+                <Text style={styles.link}>Verify</Text>
+              </Pressable>
               <Pressable onPress={() => setPreview(doc)}>
-                <Text style={styles.link}>Preview</Text>
+                <Text style={styles.link}>Details</Text>
               </Pressable>
             </View>
           </View>
@@ -78,7 +85,10 @@ export default function DocumentsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: {
+  surface: string; white: string; border: string; navy: string; ink: string; muted: string; lapis: string; indigo: string;
+}) {
+  return StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.surface },
   content: { padding: spacing.md, paddingBottom: 40 },
   card: {
@@ -109,5 +119,6 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     alignItems: 'center',
   },
-  closeText: { color: colors.white, fontWeight: '700' },
-});
+  closeText: { color: '#fff', fontWeight: '700' },
+  });
+}

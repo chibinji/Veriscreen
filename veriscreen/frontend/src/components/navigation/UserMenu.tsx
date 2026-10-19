@@ -11,6 +11,7 @@ const UserMenu: React.FC = () => {
   if (!user) return null;
 
   const handleLogout = () => {
+    if (!window.confirm('Are you sure you want to sign out?')) return;
     logout();
     navigate('/login', { replace: true, state: {} });
   };

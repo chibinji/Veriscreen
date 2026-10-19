@@ -1,19 +1,23 @@
-import React, { useCallback, useState } from 'react';
-import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useCallback, useMemo, useState } from 'react';
+import { Alert, Modal, Pressable, RefreshControl, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '../auth/AuthContext';
 import { studentApi } from '../api/studentApi';
 import { ErrorBanner, LoadingBlock } from '../components/Feedback';
 import { StatusBadge } from '../components/StatusBadge';
 import type { StudentProfile } from '../types';
-import { colors, spacing } from '../theme';
+import { spacing } from '../theme';
+import { useTheme } from '../theme/ThemeContext';
 
 export default function ProfileScreen() {
   const { token, user, logout } = useAuth();
+  const { colors, mode, setDark } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [profile, setProfile] = useState<StudentProfile | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
 
   const load = useCallback(async () => {
     if (!token) return;
@@ -79,16 +83,63 @@ export default function ProfileScreen() {
             ))}
           </View>
 
-          <Pressable style={styles.logout} onPress={logout}>
+          <View style={styles.card}>
+            <View style={styles.settingRow}>
+              <Text style={styles.value}>Dark mode</Text>
+              <Switch
+                value={mode === 'dark'}
+                onValueChange={setDark}
+                trackColor={{ false: '#d5e4de', true: colors.gold }}
+                thumbColor="#fff"
+              />
+            </View>
+            <Pressable style={styles.settingRow} onPress={() => setHelpOpen(true)}>
+              <Text style={styles.value}>Help</Text>
+            </Pressable>
+          </View>
+
+          <Pressable
+            style={styles.logout}
+            onPress={() => {
+              Alert.alert('Sign out', 'Are you sure you want to sign out?', [
+                { text: 'Stay signed in', style: 'cancel' },
+                { text: 'Sign out', style: 'destructive', onPress: () => logout() },
+              ]);
+            }}
+          >
             <Text style={styles.logoutText}>Sign out</Text>
           </Pressable>
+
+          <Modal visible={helpOpen} transparent animationType="fade" onRequestClose={() => setHelpOpen(false)}>
+            <Pressable style={styles.overlay} onPress={() => setHelpOpen(false)}>
+              <Pressable style={styles.helpCard} onPress={() => undefined}>
+                <Text style={styles.name}>Help</Text>
+                <Text style={styles.helpBody}>Sign in with your computer number. Password for the demo accounts is password123.</Text>
+                <Text style={styles.helpBody}>Documents carry a QR code with the time the document was issued. Scanning it opens a green verified page.</Text>
+                <Text style={styles.helpBody}>The HELSB tracker updates when an officer moves the application forward.</Text>
+                <Text style={styles.helpBody}>Dark mode is the switch above. It stays on this phone.</Text>
+                <Pressable style={styles.logout} onPress={() => setHelpOpen(false)}>
+                  <Text style={styles.logoutText}>Close</Text>
+                </Pressable>
+              </Pressable>
+            </Pressable>
+          </Modal>
         </>
       )}
     </ScrollView>
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: {
+  surface: string;
+  white: string;
+  border: string;
+  lapis: string;
+  muted: string;
+  navy: string;
+  danger: string;
+}) {
+  return StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.surface },
   content: { padding: spacing.md, paddingBottom: 40 },
   hero: {
@@ -109,7 +160,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 10,
   },
-  initials: { color: colors.white, fontWeight: '800', fontSize: 24 },
+  initials: { color: '#fff', fontWeight: '800', fontSize: 24 },
   name: { fontSize: 20, fontWeight: '800', color: colors.lapis },
   number: { color: colors.muted, marginBottom: 8 },
   card: {
@@ -120,6 +171,14 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   row: { paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: colors.border },
+  settingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
   label: { color: colors.muted, fontSize: 12, marginBottom: 4 },
   value: { color: colors.navy, fontWeight: '700' },
   logout: {
@@ -130,4 +189,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logoutText: { color: colors.danger, fontWeight: '800' },
-});
+  overlay: { flex: 1, backgroundColor: 'rgba(16,24,22,0.45)', justifyContent: 'center', padding: 20 },
+  helpCard: { backgroundColor: colors.white, borderRadius: 16, padding: spacing.md },
+  helpBody: { color: colors.muted, marginTop: 10, lineHeight: 20 },
+  });
+}

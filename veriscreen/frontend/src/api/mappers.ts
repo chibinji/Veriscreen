@@ -93,6 +93,8 @@ export interface BackendHelsbApplication {
   faculty?: string | null;
   email?: string | null;
   phone?: string | null;
+  pipelineStage?: string | null;
+  screeningExplanation?: string | null;
 }
 
 export interface BackendJwtResponse {
@@ -292,5 +294,7 @@ export function toApplication(
     nrc: dto.nrc || undefined,
     email: dto.email || undefined,
     phone: dto.phone || undefined,
+    pipelineStage: dto.pipelineStage || undefined,
+    screeningExplanation: dto.screeningExplanation || undefined,
   };
 }

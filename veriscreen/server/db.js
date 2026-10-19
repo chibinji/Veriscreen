@@ -57,6 +57,7 @@ CREATE TABLE IF NOT EXISTS students (
   email VARCHAR(160),
   phone VARCHAR(40),
   registration_status VARCHAR(32) DEFAULT 'ACTIVE',
+  gender VARCHAR(20),
   next_of_kin_name VARCHAR(160),
   next_of_kin_relationship VARCHAR(80),
   next_of_kin_phone VARCHAR(40),
@@ -168,6 +169,33 @@ export async function initDatabase() {
     await pool.query(statement);
   }
   await seedIfEmpty();
+  await ensureGender();
+  await ensureColumn('helsb_applications', 'pipeline_stage', 'VARCHAR(40)');
+  await ensureColumn('helsb_applications', 'screening_explanation', 'VARCHAR(255)');
+}
+
+async function ensureColumn(table, column, definition) {
+  try {
+    await pool.query(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+  } catch {
+    // The column is already present.
+  }
+}
+
+async function ensureGender() {
+  await ensureColumn('students', 'gender', 'VARCHAR(20)');
+  const genders = [
+    ['2021465934', 'Male'],
+    ['2022030346', 'Female'],
+    ['2020123456', 'Female'],
+    ['2019876543', 'Male'],
+  ];
+  for (const [id, gender] of genders) {
+    await pool.query(
+      'UPDATE students SET gender = ? WHERE id = ? AND (gender IS NULL OR gender = \'\')',
+      [gender, id],
+    );
+  }
 }
 
 async function seedIfEmpty() {
@@ -175,17 +203,17 @@ async function seedIfEmpty() {
   if (rows[0].total > 0) return;
   const passwordHash = bcrypt.hashSync('password123', 10);
   const students = [
-    ['2021465934', 'Samuel Chibinji Mwanza', '123456/78/1', 'Computer Science', 'School of Natural and Applied Sciences', 2021, 'samuel.mwanza@unza.zm', '0971112233', 'Mary Mwanza', 'Mother', '0971112244', '111222/10/1', 'Kabulonga, Lusaka'],
-    ['2022030346', 'Nosiku Mukuka', '234567/89/2', 'Information Technology', 'School of Natural and Applied Sciences', 2022, 'nosiku.mukuka@unza.zm', '0972223344', 'Joseph Mukuka', 'Father', '0972223355', '222333/11/1', 'Kitwe, Copperbelt'],
-    ['2020123456', 'Grace Banda', '345678/90/3', 'Economics', 'School of Humanities', 2020, 'grace.banda@unza.zm', '0973334455', 'Agnes Banda', 'Mother', '0973334466', '333444/12/1', 'Chipata, Eastern'],
-    ['2019876543', 'Peter Zulu', '456789/01/4', 'Electrical Engineering', 'School of Engineering', 2019, 'peter.zulu@unza.zm', '0974445566', 'Daniel Zulu', 'Brother', '0974445577', '444555/13/1', 'Mansa, Luapula'],
+    ['2021465934', 'Samuel Chibinji Mwanza', '123456/78/1', 'Computer Science', 'School of Natural and Applied Sciences', 2021, 'samuel.mwanza@unza.zm', '0971112233', 'Male', 'Mary Mwanza', 'Mother', '0971112244', '111222/10/1', 'Kabulonga, Lusaka'],
+    ['2022030346', 'Nosiku Mukuka', '234567/89/2', 'Information Technology', 'School of Natural and Applied Sciences', 2022, 'nosiku.mukuka@unza.zm', '0972223344', 'Female', 'Joseph Mukuka', 'Father', '0972223355', '222333/11/1', 'Kitwe, Copperbelt'],
+    ['2020123456', 'Grace Banda', '345678/90/3', 'Economics', 'School of Humanities', 2020, 'grace.banda@unza.zm', '0973334455', 'Female', 'Agnes Banda', 'Mother', '0973334466', '333444/12/1', 'Chipata, Eastern'],
+    ['2019876543', 'Peter Zulu', '456789/01/4', 'Electrical Engineering', 'School of Engineering', 2019, 'peter.zulu@unza.zm', '0974445566', 'Male', 'Daniel Zulu', 'Brother', '0974445577', '444555/13/1', 'Mansa, Luapula'],
   ];
   for (const student of students) {
     await pool.query(
       `INSERT INTO students
-        (id, name, nrc, program, faculty, enrollment_year, password_hash, email, phone,
+        (id, name, nrc, program, faculty, enrollment_year, password_hash, email, phone, gender,
          next_of_kin_name, next_of_kin_relationship, next_of_kin_phone, next_of_kin_nrc, next_of_kin_address)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [...student.slice(0, 6), passwordHash, ...student.slice(6)],
     );
   }
